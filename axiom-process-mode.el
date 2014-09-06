@@ -1,6 +1,8 @@
+;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+
 ;;; axiom-process-mode.el -- a Comint-derived mode for Axiom
 
-;; Copyright (C) 2013 Paul Onions
+;; Copyright (C) 2013 - 2014 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -18,7 +20,7 @@
 (require 'comint)
 
 (defcustom axiom-process-buffer-name "*Axiom REPL*"
-  "Axiom process buffer name.
+  "Default Axiom process buffer name.
 
 Must begin and end with an asterisk."
   :type 'string
@@ -29,7 +31,7 @@ Must begin and end with an asterisk."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-prompt-regexp "^.*([[:digit:]]+) ->"
+(defcustom axiom-process-prompt-regexp "^.*([[:digit:]]+) -> "
   "Regexp to recognize prompts from the Axiom process."
   :type 'regexp
   :group 'axiom)
@@ -79,9 +81,6 @@ placed in the same directory as the source file."
     (set-keymap-parent map comint-mode-map)
     map)
   "Keymap for `axiom-process-mode'.")
-
-(defvar axiom-process-schedule-cd-update nil
-  "Set non-nil to schedule a default-directory synchronization update.")
 
 (defvar axiom-process-not-running-message
   "Axiom process not running, try M-x run-axiom")
@@ -155,29 +154,8 @@ and if ECHO-RESULT is non-nil then also copy the result too."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directory tracking -- track Axiom's notion of ``current directory''
 ;;
-(defun axiom-process-cd-input-filter (str)
-  "Detect a command that may change the current directory.
-
-This function to be added to the `comint-input-filter-functions'
-list."
-  (axiom-debug-message (format "A-P-CD-I-F -->%s<--" str))
-  (when (or (string-match "^)cd" str)
-            (string-match "^)read" str))
-    (setq axiom-process-schedule-cd-update t))
-  str)
-
-(defun axiom-process-cd-output-filter (str)
-  "Invoke synchronization of the current directory when scheduled.
-
-This function to be added to the end of
-`comint-output-filter-functions'."
-  (when (and (string-match axiom-process-prompt-regexp str)
-             axiom-process-schedule-cd-update)
-    (setq axiom-process-schedule-cd-update nil)
-    (axiom-process-force-cd-update)))
-
 (defun axiom-process-force-cd-update (&optional no-msg)
-  "Force update of variable `default-directory' by querying Axiom.
+  "Force update of buffer-local variable `default-directory'.
 
 Also return the directory as a string.  If NO-MSG is non-nil then
 don't display the default-directory in a message."
@@ -465,17 +443,49 @@ prefix argument."
   :group 'axiom
   (setq comint-prompt-regexp (concat "\\(" axiom-process-prompt-regexp
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
-  (add-hook 'comint-input-filter-functions (function axiom-process-cd-input-filter))
-  (add-hook 'comint-output-filter-functions (function axiom-process-cd-output-filter))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
   (setq axiom-menu-read-file-enable t)
   (setq axiom-menu-compile-file-enable t)
-  (unless (equal "" axiom-process-preamble)
-    (axiom-process-insert-command axiom-process-preamble))
-  (setq axiom-process-schedule-cd-update t))
+  (let ((schedule-cd-update nil)
+        (process-buffer (current-buffer)))
+    (add-hook 'comint-input-filter-functions
+              (lambda (str)  ; lexical closure
+                (when (or (string-match "^)cd" str)
+                          (string-match "^)read" str))
+                  (setq schedule-cd-update t))
+                str))
+    (add-hook 'comint-output-filter-functions
+              (lambda (str)  ; lexical closure
+                (when (and (string-match axiom-process-prompt-regexp str)
+                           schedule-cd-update)
+                  (setq schedule-cd-update nil)
+                  (let ((axiom-process-buffer-name process-buffer))  ; dynamic binding
+                    (axiom-process-force-cd-update)))))
+    (unless (equal "" axiom-process-preamble)
+      (axiom-process-insert-command axiom-process-preamble))
+    (setq schedule-cd-update t)
+    (while schedule-cd-update
+      (sit-for 1))))
 
-(defun axiom-process-start (cmd)
-  "Start an Axiom process in a buffer using command line CMD.
+(defun axiom-process-start (process-cmd)
+  "Start an Axiom process in a buffer.
+
+The name of the buffer is given by variable
+`axiom-process-buffer-name', and uses major mode
+`axiom-process-mode'.  Return the buffer in which the process is
+started.  If there is a process already running then simply
+return it."
+  (with-current-buffer (get-buffer-create axiom-process-buffer-name)
+    (when (not (comint-check-proc (current-buffer)))
+      (let ((cmdlist (split-string process-cmd)))
+        (apply (function make-comint)
+               (substring axiom-process-buffer-name 1 -1)
+               (car cmdlist) nil (cdr cmdlist)))
+      (axiom-process-mode))
+    (current-buffer)))
+
+(defun run-axiom (cmd)
+  "Run an Axiom process in a buffer using program command line CMD.
 
 The name of the buffer is given by variable
 `axiom-process-buffer-name', and uses major mode `axiom-process-mode'.
@@ -485,14 +495,7 @@ then simply switch to it."
   (interactive (list (if current-prefix-arg
 			 (read-string "Run Axiom: " axiom-process-program)
 		       axiom-process-program)))
-  (when (not (comint-check-proc axiom-process-buffer-name))
-    (let ((cmdlist (split-string cmd)))
-      (set-buffer (apply (function make-comint)
-                         (substring axiom-process-buffer-name 1 -1)
-                         (car cmdlist) nil (cdr cmdlist)))
-      (axiom-process-mode)))
-  (pop-to-buffer axiom-process-buffer-name))
-
-(defalias 'run-axiom 'axiom-process-start)
+  (let ((buf (axiom-process-start cmd)))
+    (pop-to-buffer buf)))
 
 (provide 'axiom-process-mode)

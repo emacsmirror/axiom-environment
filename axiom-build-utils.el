@@ -1,6 +1,8 @@
+;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+
 ;;; axiom-build-utils.el -- utilities to help build the Axiom environment
 
-;; Copyright (C) 2013 Paul Onions
+;; Copyright (C) 2013 - 2014 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS

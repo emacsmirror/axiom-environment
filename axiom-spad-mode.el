@@ -1,6 +1,8 @@
+;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+
 ;;; axiom-spad-mode.el -- Major mode for the Axiom library language
 
-;; Copyright (C) 2013 Paul Onions
+;; Copyright (C) 2013 - 2014 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS

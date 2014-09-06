@@ -22,7 +22,7 @@
   '(axiom-process-program "env AXIOM=/usr/local/axiom/mnt/MACOSX PATH=/usr/local/axiom/mnt/MACOSX/bin:/usr/bin:/bin /usr/local/axiom/mnt/MACOSX/bin/axiom -noht"))
 
 (custom-theme-set-variables 'axiom-on-gcl
-  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) ->"))
+  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) -> "))
 
 (custom-theme-set-variables 'axiom-on-gcl
   '(axiom-process-break-prompt-regexp "^.+>>"))

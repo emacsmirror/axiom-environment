@@ -1,6 +1,8 @@
+;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+
 ;;; axiom-input-mode.el -- Major mode for the Axiom interactive language
 
-;; Copyright (C) 2013 Paul Onions
+;; Copyright (C) 2013 - 2014 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS

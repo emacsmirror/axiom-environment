@@ -22,7 +22,7 @@
   '(axiom-process-program "fricas -nosman"))
 
 (custom-theme-set-variables 'fricas-on-sbcl
-  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) ->"))
+  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) -> "))
 
 (custom-theme-set-variables 'fricas-on-sbcl
   '(axiom-process-break-prompt-regexp "^0]"))
