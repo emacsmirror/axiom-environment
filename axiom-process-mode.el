@@ -31,7 +31,7 @@ Must begin and end with an asterisk."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-prompt-regexp "^.*([[:digit:]]+) -> "
+(defcustom axiom-process-prompt-regexp "^.*([[:digit:]]+) ->"
   "Regexp to recognize prompts from the Axiom process."
   :type 'regexp
   :group 'axiom)

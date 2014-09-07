@@ -22,7 +22,7 @@
   '(axiom-process-program "open-axiom --no-server"))
 
 (custom-theme-set-variables 'openaxiom-on-sbcl
-  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) -> "))
+  '(axiom-process-prompt-regexp "^.*([[:digit:]]+) ->"))
 
 (custom-theme-set-variables 'openaxiom-on-sbcl
   '(axiom-process-break-prompt-regexp "^0]"))
