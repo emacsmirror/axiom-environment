@@ -66,7 +66,7 @@
   "Axiom environment data directory.")
 
 (defun axiom-write-data-file (obj filename)
-  "Write OBJ to FILENAME using function `print'.
+  "Write OBJ to FILENAME using function `pp', the pretty-printer.
 
 The directory in which to write the file defaults to the value of
 the variable `axiom-environment-data-dir'. This can be overridden
@@ -74,7 +74,7 @@ by specifying a different path in the FILENAME string (either
 relative or absolute)."
   (let ((default-directory axiom-environment-data-dir))
     (with-temp-buffer
-      (print obj (current-buffer))
+      (pp obj (current-buffer))
       (write-region (point-min) (point-max) filename))))
 
 (defun axiom-read-data-file (filename)
