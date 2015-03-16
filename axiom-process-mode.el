@@ -151,6 +151,30 @@ and if ECHO-RESULT is non-nil then also copy the result too."
         (when (and echo-cmd (not echo-result))  ; get prompt back
           (axiom-process-insert-command ""))))))
 
+(defun axiom-process-get-old-input ()
+  "An Axiom-specific replacement for `comint-get-old-input'.
+
+Return the concatenation of the current line and all subsequent
+continuation-lines (underscores escape new lines)."
+  (comint-bol)
+  (let ((posns (list (line-end-position)))
+        (n 2)
+        (done nil))
+    (while (not done)
+      (let ((p (line-end-position n)))
+        (unless (eql p (car posns))
+          (push p posns)
+          (incf n))
+        (unless (eql (char-before p) ?_)
+          (setq done t))))
+    (let ((line "")
+          (beg (point)))
+      (dolist (end (reverse posns))
+        (let ((end-excl-underscore (if (eql (char-before end) ?_) (1- end) end)))
+          (setq line (concat line (buffer-substring-no-properties beg end-excl-underscore))))
+        (setq beg (1+ end)))
+      line)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directory tracking -- track Axiom's notion of ``current directory''
 ;;
@@ -443,6 +467,7 @@ prefix argument."
   :group 'axiom
   (setq comint-prompt-regexp (concat "\\(" axiom-process-prompt-regexp
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
+  (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
   (setq axiom-menu-read-file-enable t)
   (setq axiom-menu-compile-file-enable t)
