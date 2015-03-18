@@ -2,7 +2,7 @@
 
 ;;; axiom-base.el -- basic setup for the Axiom environment
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -313,6 +313,59 @@ string (either relative or absolute)."
       '(menu-item "Show Package..." axiom-process-show-package))
     map)
   "The Axiom environment keymap.")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;
+(defun axiom-move-to-next-line ()
+  "Move to beginning of next line.
+
+Move beyond current line and all subsequent
+continuation-lines (underscores escape new lines) to the beginning
+of the next non-blank line."
+  (let ((posn nil)
+        (n 1)
+        (done nil))
+    (while (not done)
+      (let ((p (line-end-position n)))
+        (cond ((eql p posn)
+               (setq done t))
+              ((eql (char-before p) ?_)
+               (setq posn p)
+               (incf n))
+              (t
+               (setq posn p)
+               (setq done t)))))
+    (goto-char posn)
+    (re-search-forward "^.+$")
+    (beginning-of-line)))
+
+(defun axiom-get-rest-of-line ()
+  "Return the remainder of the current line.
+
+Return a string containing the remainder of the current
+line (from point), and the concatenation of all subsequent
+continuation-lines (underscores escape new lines)."
+  (let ((posns nil)
+        (n 1)
+        (done nil))
+    (while (not done)
+      (let ((p (line-end-position n)))
+        (cond ((eql p (car posns))
+               (setq done t))
+              ((eql (char-before p) ?_)
+               (push p posns)
+               (incf n))
+              (t
+               (push p posns)
+               (setq done t)))))
+    (let ((line "")
+          (beg (point)))
+      (dolist (end (reverse posns))
+        (let ((end-excl-underscore (if (eql (char-before end) ?_) (1- end) end)))
+          (setq line (concat line (buffer-substring-no-properties beg end-excl-underscore))))
+        (setq beg (1+ end)))
+      line)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Developer utils

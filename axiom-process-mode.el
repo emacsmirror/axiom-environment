@@ -2,7 +2,7 @@
 
 ;;; axiom-process-mode.el -- a Comint-derived mode for Axiom
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -119,7 +119,7 @@ the user is part-way through editing the next command."
       ;; Remove newlines from end of command string
       (while (and (> (length command-text) 0)
                   (char-equal ?\n (aref command-text (1- (length command-text)))))
-        (setq command-text (substring command-text 0 (- (length command-text) 1))))
+        (setq command-text (substring command-text 0 (1- (length command-text)))))
       ;; Contrary to what it says in the documentation of `comint-send-input',
       ;; calling it sends _all_ text from the process mark to the _end_ of
       ;; the buffer to the process.  So we need to temporarily remove any
@@ -157,23 +157,7 @@ and if ECHO-RESULT is non-nil then also copy the result too."
 Return the concatenation of the current line and all subsequent
 continuation-lines (underscores escape new lines)."
   (comint-bol)
-  (let ((posns (list (line-end-position)))
-        (n 2)
-        (done nil))
-    (while (not done)
-      (let ((p (line-end-position n)))
-        (unless (eql p (car posns))
-          (push p posns)
-          (incf n))
-        (unless (eql (char-before p) ?_)
-          (setq done t))))
-    (let ((line "")
-          (beg (point)))
-      (dolist (end (reverse posns))
-        (let ((end-excl-underscore (if (eql (char-before end) ?_) (1- end) end)))
-          (setq line (concat line (buffer-substring-no-properties beg end-excl-underscore))))
-        (setq beg (1+ end)))
-      line)))
+  (axiom-get-rest-of-line))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directory tracking -- track Axiom's notion of ``current directory''
@@ -203,16 +187,23 @@ don't display the default-directory in a message."
     dirname))
   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Evaluating a string
+;;
+(defun axiom-process-eval-string (str)
+  "Evaluate the given string in the Axiom process."
+  (if (null (get-buffer axiom-process-buffer-name))
+      (message axiom-process-not-running-message)
+    (progn
+      (display-buffer axiom-process-buffer-name)
+      (axiom-process-insert-command str))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evaluating a region
 ;;
 (defun axiom-process-eval-region (start end)
   "Evaluate the given region in the Axiom process."
   (interactive "r")
-  (if (null (get-buffer axiom-process-buffer-name))
-      (message axiom-process-not-running-message)
-    (progn
-      (display-buffer axiom-process-buffer-name)
-      (axiom-process-insert-command (buffer-substring-no-properties start end)))))
+  (axiom-process-eval-string (buffer-substring-no-properties start end)))
 
 (defun axiom-process-read-region (start end)
   "Copy region into a temporary file and )read it."

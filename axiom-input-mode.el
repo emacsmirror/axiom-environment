@@ -2,7 +2,7 @@
 
 ;;; axiom-input-mode.el -- Major mode for the Axiom interactive language
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -52,6 +52,7 @@
 (defvar axiom-input-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map axiom-common-keymap)
+    (define-key map (kbd "C-<return>") 'axiom-input-send-line)
     map)
   "The Axiom input mode local keymap.")
 
@@ -61,6 +62,14 @@
 (defun axiom-input-read-buffer ()
   (interactive)
   (axiom-process-read-file buffer-file-name))
+
+(defun axiom-input-send-line ()
+  (interactive)
+  (let ((str (save-excursion
+               (beginning-of-line)
+               (axiom-get-rest-of-line))))
+    (axiom-process-eval-string str)
+    (axiom-move-to-next-line)))
 
 (define-derived-mode axiom-input-mode prog-mode "Axiom Input"
   "Major mode for the Axiom-Input interactive language."
