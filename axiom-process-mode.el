@@ -119,7 +119,7 @@ the user is part-way through editing the next command."
       ;; Remove newlines from end of command string
       (while (and (> (length command-text) 0)
                   (char-equal ?\n (aref command-text (1- (length command-text)))))
-        (setq command-text (substring command-text 0 (- (length command-text) 2))))
+        (setq command-text (substring command-text 0 (- (length command-text) 1))))
       ;; Contrary to what it says in the documentation of `comint-send-input',
       ;; calling it sends _all_ text from the process mark to the _end_ of
       ;; the buffer to the process.  So we need to temporarily remove any
