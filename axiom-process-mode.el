@@ -73,6 +73,11 @@ placed in the same directory as the source file."
   :type 'string
   :group 'axiom)
 
+(defcustom axiom-process-webview-url "http://fricas.github.io/api/"
+  "The base URL for constructor documentation."
+  :type 'string
+  :group 'axiom)
+
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
 
@@ -276,6 +281,14 @@ buffer, otherwise do not display it."
         (cdr rslt)
       name-or-abbrev)))
 
+(defun axiom-process-constructor-name (name-or-abbrev)
+  (let ((rslt (or (assoc name-or-abbrev axiom-standard-package-info)
+                  (assoc name-or-abbrev axiom-standard-domain-info)
+                  (assoc name-or-abbrev axiom-standard-category-info))))
+    (if rslt
+        (cdr rslt)
+      name-or-abbrev)))
+
 (defun axiom-process-constructor-type (name-or-abbrev)
   (cond ((member name-or-abbrev axiom-standard-package-names)
          (cons :package :name))
@@ -305,6 +318,20 @@ buffer, otherwise do not display it."
                   (t
                    name-or-abbrev)))))
 
+(defun axiom-process-webview-constructor (name-or-abbrev)
+  "Show information about NAME-OR-ABBREV in a web browser.
+
+Invokes `browse-url' on a URL made by appending the given
+constructor name to the base URL held in customizable variable
+`axiom-process-webview-url'."
+  (interactive (list (completing-read "Constructor: "
+                                      axiom-standard-constructor-names-and-abbreviations
+                                      nil 'confirm (thing-at-point 'word))))
+  (let ((url (concat axiom-process-webview-url
+                     (axiom-process-constructor-name name-or-abbrev)
+                      ".html")))
+    (browse-url url)))
+
 (defun axiom-process-show-constructor (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -319,7 +346,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read "Constructor: "
-                                      axiom-standard-constructor-names-and-abbreviations)
+                                      axiom-standard-constructor-names-and-abbreviations
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
@@ -348,7 +376,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read "Package: "
-                                      axiom-standard-package-names-and-abbreviations)
+                                      axiom-standard-package-names-and-abbreviations
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -365,7 +394,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read "Domain: "
-                                      axiom-standard-domain-names-and-abbreviations)
+                                      axiom-standard-domain-names-and-abbreviations
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -382,7 +412,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read "Category: "
-                                      axiom-standard-category-names-and-abbreviations)
+                                      axiom-standard-category-names-and-abbreviations
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -398,7 +429,8 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Operation: " axiom-standard-operation-names)
+  (interactive (list (completing-read "Operation: " axiom-standard-operation-names
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
@@ -428,7 +460,7 @@ be overridden by setting IS-CONSTRUCTOR non-nil, in which case ``)show
 NAME'' will always be called.  Interactively this can be done with a
 prefix argument."
   (interactive (list (completing-read "Apropos: " axiom-standard-names-and-abbreviations
-                                      nil nil (thing-at-point 'word))
+                                      nil 'confirm (thing-at-point 'word))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)

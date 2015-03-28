@@ -273,6 +273,7 @@ string (either relative or absolute)."
     (define-key map (kbd "C-c C-d k") 'axiom-process-show-constructor)
     (define-key map (kbd "C-c C-d o") 'axiom-process-display-operation)
     (define-key map (kbd "C-c C-d a") 'axiom-process-apropos-thing-at-point)
+    (define-key map (kbd "C-c C-d w") 'axiom-process-webview-constructor)
     (define-key map (kbd "C-c C-k") 'axiom-process-compile-file)
     (define-key map (kbd "C-c C-r") 'axiom-process-read-file)
     (define-key map (kbd "C-c C-e") 'axiom-process-eval-region)
@@ -298,6 +299,10 @@ string (either relative or absolute)."
       '(menu-item "Compile File..." axiom-process-compile-file
                   :enable axiom-menu-compile-file-enable))
     (define-key menu-map [axiom-menu-separator-1]
+      '(menu-item "--"))
+    (define-key menu-map [axiom-menu-webview-constructor]
+      '(menu-item "Webview Constructor..." axiom-process-webview-constructor))
+    (define-key menu-map [axiom-menu-separator-0]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-apropos]
       '(menu-item "Apropos (at point)..." axiom-process-apropos-thing-at-point))
