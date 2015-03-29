@@ -74,8 +74,13 @@ placed in the same directory as the source file."
   :group 'axiom)
 
 (defcustom axiom-process-webview-url "http://fricas.github.io/api/"
-  "The base URL for constructor documentation."
+  "The base URL for SPAD constructor documentation."
   :type 'string
+  :group 'axiom)
+
+(defcustom axiom-process-spad-source-dirs '("./" "/usr/local/fricas/lib/fricas/target/i686-apple-darwin14.1.0/src/algebra/")
+  "A list of directories in which to search for SPAD source code."
+  :type 'list
   :group 'axiom)
 
 (defvar axiom-process-mode-hook nil
@@ -163,6 +168,28 @@ Return the concatenation of the current line and all subsequent
 continuation-lines (underscores escape new lines)."
   (comint-bol)
   (axiom-get-rest-of-line))
+
+(defun axiom-process-find-constructor-source (name-or-abbrev)
+  "Attempt to find the SPAD source for the given constructor.
+
+Invoke a grep shell-command looking in the directories specified by
+`axiom-process-spad-source-dirs'.  Return a list containing
+a filename and a line number."
+  (let ((filename nil)
+	(line-number nil))
+    (dolist (dir axiom-process-spad-source-dirs)
+      (unless filename
+	(let ((grep-out (with-temp-buffer
+			  (shell-command
+			   (concat "grep -n ')abbrev .*\\<" name-or-abbrev "\\>' " dir "*.spad")
+			   t nil)
+			  (buffer-substring-no-properties (point-min) (point-max)))))
+	  (when (> (length grep-out) 0)
+	    (string-match "\\(.+\\):\\(.+\\):" grep-out)
+	    (setq filename (substring grep-out 0 (match-end 1)))
+	    (setq line-number (string-to-number (substring grep-out (1+ (match-end 1)) (match-end 2))))))))
+    (when (and filename line-number)
+      (list filename line-number))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directory tracking -- track Axiom's notion of ``current directory''
@@ -292,19 +319,19 @@ buffer, otherwise do not display it."
 (defun axiom-process-verify-package-name-or-abbrev (name-or-abbrev)
   "Return package name if valid name or abbreviation, or nil otherwise."
   (let ((fquery (assoc name-or-abbrev axiom-standard-package-info))
-	(rquery (rassoc name-or-abbrev axiom-standard-package-info)))
+        (rquery (rassoc name-or-abbrev axiom-standard-package-info)))
     (or (cdr fquery) (cdr rquery))))
 
 (defun axiom-process-verify-domain-name-or-abbrev (name-or-abbrev)
   "Return domain name if valid name or abbreviation given, or nil otherwise."
   (let ((fquery (assoc name-or-abbrev axiom-standard-domain-info))
-	(rquery (rassoc name-or-abbrev axiom-standard-domain-info)))
+        (rquery (rassoc name-or-abbrev axiom-standard-domain-info)))
     (or (cdr fquery) (cdr rquery))))
 
 (defun axiom-process-verify-category-name-or-abbrev (name-or-abbrev)
   "Return category name if valid name or abbreviation given, or nil otherwise."
   (let ((fquery (assoc name-or-abbrev axiom-standard-category-info))
-	(rquery (rassoc name-or-abbrev axiom-standard-category-info)))
+        (rquery (rassoc name-or-abbrev axiom-standard-category-info)))
     (or (cdr fquery) (cdr rquery))))
 
 (defun axiom-process-verify-constructor-name-or-abbrev (name-or-abbrev)
@@ -344,20 +371,6 @@ buffer, otherwise do not display it."
                   (t
                    name-or-abbrev)))))
 
-(defun axiom-process-webview-constructor (name-or-abbrev)
-  "Show information about NAME-OR-ABBREV in a web browser.
-
-Invokes `browse-url' on a URL made by appending the given
-constructor name and .html to the base URL held in customizable
-variable `axiom-process-webview-url'."
-  (interactive (list (completing-read
-		      "Constructor: " axiom-standard-constructor-names-and-abbreviations nil 'confirm
-		      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
-  (let ((url (concat axiom-process-webview-url
-                     (axiom-process-constructor-name name-or-abbrev)
-                      ".html")))
-    (browse-url url)))
-
 (defun axiom-process-show-constructor (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -372,10 +385,10 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read
-		      "Constructor: "
-		      axiom-standard-constructor-names-and-abbreviations
-		      nil 'confirm
-		      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))
+                      "Constructor: "
+                      axiom-standard-constructor-names-and-abbreviations
+                      nil 'confirm
+                      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
@@ -404,8 +417,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read
-		      "Package: " axiom-standard-package-names-and-abbreviations nil 'confirm
-		      (axiom-process-verify-package-name-or-abbrev (thing-at-point 'word)))
+                      "Package: " axiom-standard-package-names-and-abbreviations nil 'confirm
+                      (axiom-process-verify-package-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -422,8 +435,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read
-		      "Domain: " axiom-standard-domain-names-and-abbreviations nil 'confirm
-		      (axiom-process-verify-domain-name-or-abbrev (thing-at-point 'word)))
+                      "Domain: " axiom-standard-domain-names-and-abbreviations nil 'confirm
+                      (axiom-process-verify-domain-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -440,8 +453,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read
-		      "Category: " axiom-standard-category-names-and-abbreviations nil 'confirm
-		      (axiom-process-verify-category-name-or-abbrev (thing-at-point 'word)))
+                      "Category: " axiom-standard-category-names-and-abbreviations nil 'confirm
+                      (axiom-process-verify-category-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -458,8 +471,8 @@ reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
   (interactive (list (completing-read
-		      "Operation: " axiom-standard-operation-names nil 'confirm
-		      (axiom-process-verify-operation-name (thing-at-point 'word)))
+                      "Operation: " axiom-standard-operation-names nil 'confirm
+                      (axiom-process-verify-operation-name (thing-at-point 'word)))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
@@ -498,6 +511,34 @@ prefix argument."
              (axiom-process-show-constructor name t))
             (t
              (axiom-process-display-operation name t))))))
+
+(defun axiom-process-webview-constructor (name-or-abbrev)
+  "Show information about NAME-OR-ABBREV in a web browser.
+
+Invokes `browse-url' on a URL made by appending the given
+constructor name and .html to the base URL held in customizable
+variable `axiom-process-webview-url'."
+  (interactive (list (completing-read
+                      "Constructor: " axiom-standard-constructor-names-and-abbreviations nil 'confirm
+                      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
+  (let ((url (concat axiom-process-webview-url
+                     (axiom-process-constructor-name name-or-abbrev)
+                      ".html")))
+    (browse-url url)))
+
+(defun axiom-process-edit-constructor-source (name-or-abbrev)
+  "Open the SPAD source file containing NAME-OR-ABBREV."
+  (interactive (list (completing-read
+                      "Constructor: "
+                      axiom-standard-constructor-names-and-abbreviations
+                      nil 'confirm
+                      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
+  (let ((location (axiom-process-find-constructor-source name-or-abbrev)))
+    (if location
+	(let ((buf (find-file (first location))))
+	  (switch-to-buffer buf)
+	  (goto-line (second location)))
+      (message "Source not found"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Axiom process mode -- derived from COMINT mode
@@ -570,8 +611,8 @@ With a prefix argument, allow CMD to be edited first (default is value
 of `axiom-process-program').  If there is a process already running
 then simply switch to it."
   (interactive (list (if current-prefix-arg
-			 (read-string "Run Axiom: " axiom-process-program)
-		       axiom-process-program)))
+                         (read-string "Run Axiom: " axiom-process-program)
+                       axiom-process-program)))
   (let ((buf (axiom-process-start cmd)))
     (pop-to-buffer buf)))
 
