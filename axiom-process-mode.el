@@ -289,6 +289,32 @@ buffer, otherwise do not display it."
         (cdr rslt)
       name-or-abbrev)))
 
+(defun axiom-process-verify-package-name-or-abbrev (name-or-abbrev)
+  "Return package name if valid name or abbreviation, or nil otherwise."
+  (let ((fquery (assoc name-or-abbrev axiom-standard-package-info))
+	(rquery (rassoc name-or-abbrev axiom-standard-package-info)))
+    (or (cdr fquery) (cdr rquery))))
+
+(defun axiom-process-verify-domain-name-or-abbrev (name-or-abbrev)
+  "Return domain name if valid name or abbreviation given, or nil otherwise."
+  (let ((fquery (assoc name-or-abbrev axiom-standard-domain-info))
+	(rquery (rassoc name-or-abbrev axiom-standard-domain-info)))
+    (or (cdr fquery) (cdr rquery))))
+
+(defun axiom-process-verify-category-name-or-abbrev (name-or-abbrev)
+  "Return category name if valid name or abbreviation given, or nil otherwise."
+  (let ((fquery (assoc name-or-abbrev axiom-standard-category-info))
+	(rquery (rassoc name-or-abbrev axiom-standard-category-info)))
+    (or (cdr fquery) (cdr rquery))))
+
+(defun axiom-process-verify-constructor-name-or-abbrev (name-or-abbrev)
+  (or (axiom-process-verify-package-name-or-abbrev name-or-abbrev)
+      (axiom-process-verify-domain-name-or-abbrev name-or-abbrev)
+      (axiom-process-verify-category-name-or-abbrev name-or-abbrev)))
+
+(defun axiom-process-verify-operation-name (name)
+  (car (member name axiom-standard-operation-info)))
+
 (defun axiom-process-constructor-type (name-or-abbrev)
   (cond ((member name-or-abbrev axiom-standard-package-names)
          (cons :package :name))
@@ -322,11 +348,11 @@ buffer, otherwise do not display it."
   "Show information about NAME-OR-ABBREV in a web browser.
 
 Invokes `browse-url' on a URL made by appending the given
-constructor name to the base URL held in customizable variable
-`axiom-process-webview-url'."
-  (interactive (list (completing-read "Constructor: "
-                                      axiom-standard-constructor-names-and-abbreviations
-                                      nil 'confirm (thing-at-point 'word))))
+constructor name and .html to the base URL held in customizable
+variable `axiom-process-webview-url'."
+  (interactive (list (completing-read
+		      "Constructor: " axiom-standard-constructor-names-and-abbreviations nil 'confirm
+		      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
   (let ((url (concat axiom-process-webview-url
                      (axiom-process-constructor-name name-or-abbrev)
                       ".html")))
@@ -345,9 +371,11 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Constructor: "
-                                      axiom-standard-constructor-names-and-abbreviations
-                                      nil 'confirm (thing-at-point 'word))
+  (interactive (list (completing-read
+		      "Constructor: "
+		      axiom-standard-constructor-names-and-abbreviations
+		      nil 'confirm
+		      (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
@@ -375,9 +403,9 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Package: "
-                                      axiom-standard-package-names-and-abbreviations
-                                      nil 'confirm (thing-at-point 'word))
+  (interactive (list (completing-read
+		      "Package: " axiom-standard-package-names-and-abbreviations nil 'confirm
+		      (axiom-process-verify-package-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -393,9 +421,9 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Domain: "
-                                      axiom-standard-domain-names-and-abbreviations
-                                      nil 'confirm (thing-at-point 'word))
+  (interactive (list (completing-read
+		      "Domain: " axiom-standard-domain-names-and-abbreviations nil 'confirm
+		      (axiom-process-verify-domain-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -411,9 +439,9 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Category: "
-                                      axiom-standard-category-names-and-abbreviations
-                                      nil 'confirm (thing-at-point 'word))
+  (interactive (list (completing-read
+		      "Category: " axiom-standard-category-names-and-abbreviations nil 'confirm
+		      (axiom-process-verify-category-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
@@ -429,8 +457,9 @@ to it, unless FORCE-UPDATE is non-nil in which case the buffer is
 reconstructed with another query to the Axiom process.
 
 Interactively, FORCE-UPDATE can be set with a prefix argument."
-  (interactive (list (completing-read "Operation: " axiom-standard-operation-names
-                                      nil 'confirm (thing-at-point 'word))
+  (interactive (list (completing-read
+		      "Operation: " axiom-standard-operation-names nil 'confirm
+		      (axiom-process-verify-operation-name (thing-at-point 'word)))
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
