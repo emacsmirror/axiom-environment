@@ -78,7 +78,8 @@ placed in the same directory as the source file."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-spad-source-dirs '("./" "/usr/local/fricas/lib/fricas/target/i686-apple-darwin14.1.0/src/algebra/")
+(defcustom axiom-process-spad-source-dirs
+  '("./" "/usr/local/fricas/lib/fricas/target/i686-apple-darwin14.1.0/src/algebra/")
   "A list of directories in which to search for SPAD source code."
   :type 'list
   :group 'axiom)
@@ -175,10 +176,10 @@ continuation-lines (underscores escape new lines)."
 Invoke a grep shell-command looking in the directories specified by
 `axiom-process-spad-source-dirs'.  Return a list containing
 a filename and a line number."
-  (let ((filename nil)
-	(line-number nil))
+  (let ((filename "")
+	(line-number 0))
     (dolist (dir axiom-process-spad-source-dirs)
-      (unless filename
+      (unless (> line-number 0)
 	(let ((grep-out (with-temp-buffer
 			  (shell-command
 			   (concat "grep -n ')abbrev .*\\<" name-or-abbrev "\\>' " dir "*.spad")
@@ -188,7 +189,7 @@ a filename and a line number."
 	    (string-match "\\(.+\\):\\(.+\\):" grep-out)
 	    (setq filename (substring grep-out 0 (match-end 1)))
 	    (setq line-number (string-to-number (substring grep-out (1+ (match-end 1)) (match-end 2))))))))
-    (when (and filename line-number)
+    (when (and (> (length filename) 0) (> line-number 0))
       (list filename line-number))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
