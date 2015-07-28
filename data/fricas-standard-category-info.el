@@ -126,7 +126,6 @@
  ("MONADWU" . "MonadWithUnit")
  ("MONAD" . "Monad")
  ("MONOGEN" . "MonogenicAlgebra")
- ("MLO" . "MonogenicLinearOperator")
  ("MRCAT" . "MonoidRingCategory")
  ("MONOID" . "Monoid")
  ("MDAGG" . "MultiDictionary")
