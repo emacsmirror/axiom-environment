@@ -143,16 +143,22 @@ the user is part-way through editing the next command."
       (comint-send-input nil t)
       (insert pending-text))))
 
-(defun axiom-process-redirect-send-command (command output-buffer &optional display echo-cmd echo-result)
+(defun axiom-process-redirect-send-command (command output-buffer &optional display echo-cmd echo-result output-command)
   "Send COMMAND to Axiom and put result in OUTPUT-BUFFER.
 
 If DISPLAY is non-nil then display the result buffer.
 
 If ECHO-CMD is non-nil then copy the command to the process buffer,
-and if ECHO-RESULT is non-nil then also copy the result too."
+and if ECHO-RESULT is non-nil then also copy the result too.
+
+If OUTPUT-COMMAND is non-nil then include command in output to
+OUTPUT-BUFFER."
   (with-current-buffer axiom-process-buffer-name
     (save-excursion
       (let ((proc (get-buffer-process (current-buffer))))
+        (when output-command
+          (with-current-buffer output-buffer
+            (insert command "\n")))
         (when echo-cmd
           (goto-char (process-mark proc))
           (insert-before-markers command))

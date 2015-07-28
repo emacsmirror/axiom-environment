@@ -85,8 +85,7 @@ This function is called by `org-babel-execute-src-block'."
       (with-axiom-process-query-buffer
        (dolist (line lines)
          (beginning-of-line)
-         (insert line)
-         (axiom-process-redirect-send-command line (current-buffer) nil t t))
+         (axiom-process-redirect-send-command line (current-buffer) nil t t t))
        (buffer-substring (point-min) (point-max))))))
 
 ;;; Internal helper functions
