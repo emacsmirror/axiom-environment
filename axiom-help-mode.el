@@ -37,7 +37,7 @@
 (defvar axiom-help-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map axiom-common-keymap)
-    (define-key map (kbd "q") 'bury-buffer)
+    (define-key map (kbd "q") 'quit-window)
     map)
   "The Axiom Help mode local keymap.")
 

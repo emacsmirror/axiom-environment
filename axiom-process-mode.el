@@ -280,19 +280,25 @@ buffer, otherwise do not display it."
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
-    (progn
-      (unless no-display
-        (display-buffer (get-buffer-create axiom-process-compile-file-buffer-name)))
+    (let ((popup (unless no-display
+                   (display-buffer (get-buffer-create axiom-process-compile-file-buffer-name)))))
       (with-current-buffer axiom-process-buffer-name
         (let ((current-dir (axiom-process-force-cd-update t))
               (result-dir (if axiom-process-compile-file-use-result-directory
                               (file-name-as-directory (expand-file-name axiom-process-compile-file-result-directory))
                             (file-name-directory (expand-file-name filename)))))
           (with-current-buffer (get-buffer-create axiom-process-compile-file-buffer-name)
+            (setq buffer-read-only nil)
             (erase-buffer)
+            (axiom-help-mode)
             (axiom-process-redirect-send-command (format ")cd %s" result-dir) (current-buffer) (not no-display))
             (axiom-process-redirect-send-command (format ")compile %s" (expand-file-name filename)) (current-buffer) (not no-display))
-            (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))))))))
+            (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))
+            (set-buffer-modified-p nil)
+            (setq buffer-read-only t))))
+      (when (and popup axiom-select-popup-windows)
+        (select-window popup)
+        (end-of-buffer)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Browsing/inspection utility functions
@@ -401,15 +407,17 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
       (message axiom-process-not-running-message)
     (unless (equal "" name-or-abbrev)
       (let ((bufname (axiom-process-constructor-buffer-name name-or-abbrev)))
-        (if (and (get-buffer bufname) (not force-update))
-            (display-buffer bufname)
+        (when (or (not (get-buffer bufname)) force-update)
           (with-current-buffer (get-buffer-create bufname)
             (setq buffer-read-only nil)
             (erase-buffer)
             (axiom-help-mode)
             (axiom-process-redirect-send-command (format ")show %s" name-or-abbrev) (current-buffer) t nil nil)
             (set-buffer-modified-p nil)
-            (setq buffer-read-only t)))))))
+            (setq buffer-read-only t)))
+        (let ((popup (display-buffer bufname)))
+          (when (and popup axiom-select-popup-windows)
+            (select-window popup)))))))
 
 (defun axiom-process-show-package (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
@@ -485,15 +493,17 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
       (message axiom-process-not-running-message)
     (unless (equal "" operation-name)
       (let ((bufname (format "*Axiom Operation: %s*" operation-name)))
-        (if (and (get-buffer bufname) (not force-update))
-            (display-buffer bufname)
+        (when (or (not (get-buffer bufname)) force-update)
           (with-current-buffer (get-buffer-create bufname)
             (setq buffer-read-only nil)
             (erase-buffer)
             (axiom-help-mode)
             (axiom-process-redirect-send-command (format ")display operation %s" operation-name) (current-buffer) t nil nil)
             (set-buffer-modified-p nil)
-            (setq buffer-read-only t)))))))
+            (setq buffer-read-only t)))
+        (let ((popup (display-buffer bufname)))
+          (when (and popup axiom-select-popup-windows)
+            (select-window popup)))))))
 
 (defun axiom-process-apropos-thing-at-point (name &optional is-constructor)
   "Show information about NAME in a popup buffer.
@@ -526,7 +536,7 @@ Invokes `browse-url' on a URL made by appending the given
 constructor name and .html to the base URL held in customizable
 variable `axiom-process-webview-url'."
   (interactive (list (completing-read
-                      "Constructor: " axiom-standard-constructor-names-and-abbreviations nil 'confirm
+                      "Show web-page for constructor: " axiom-standard-constructor-names-and-abbreviations nil 'confirm
                       (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
   (let ((url (concat axiom-process-webview-url
                      (axiom-process-constructor-name name-or-abbrev)
@@ -536,7 +546,7 @@ variable `axiom-process-webview-url'."
 (defun axiom-process-edit-constructor-source (name-or-abbrev)
   "Open the SPAD source file containing NAME-OR-ABBREV."
   (interactive (list (completing-read
-                      "Constructor: "
+                      "Find source for constructor: "
                       axiom-standard-constructor-names-and-abbreviations
                       nil 'confirm
                       (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))

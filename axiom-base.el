@@ -22,6 +22,11 @@
 (defgroup axiom nil
   "An environment for working with the Axiom computer algebra system.")
 
+(defcustom axiom-select-popup-windows t
+  "Set non-nil to automatically switch to popup windows."
+  :type 'boolean
+  :group 'axiom)
+
 (defcustom axiom-standard-package-info-file "fricas-standard-package-info.el"
   "File from which to `read' standard package information."
   :type 'string
