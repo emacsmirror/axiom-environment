@@ -47,6 +47,10 @@
 (define-derived-mode axiom-help-mode prog-mode "Axiom Help"
   "Major mode for Axiom Help buffers."
   :group 'axiom
-  (setq font-lock-defaults (list axiom-help-font-lock-keywords)))
+  (setq font-lock-defaults (list axiom-help-font-lock-keywords))
+  (setq axiom-menu-compile-file-enable nil)
+  (setq axiom-menu-eval-region-enable nil)
+  (setq axiom-menu-read-region-enable nil)
+  (setq axiom-menu-read-file-enable nil))
 
 (provide 'axiom-help-mode)

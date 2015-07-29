@@ -294,7 +294,7 @@ string (either relative or absolute)."
       '(menu-item "Read File..." axiom-process-read-file
                   :enable axiom-menu-read-file-enable))
     (define-key menu-map [axiom-menu-read-region]
-      '(menu-item "Read Region..." axiom-process-read-region
+      '(menu-item "Read Region" axiom-process-read-region
                   :enable axiom-menu-read-region-enable))
     (define-key menu-map [axiom-menu-eval-region]
       '(menu-item "Eval Region" axiom-process-eval-region

@@ -579,8 +579,10 @@ variable `axiom-process-webview-url'."
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
   (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
-  (setq axiom-menu-read-file-enable t)
-  (setq axiom-menu-compile-file-enable t)
+  (setq axiom-menu-compile-file-enable nil)
+  (setq axiom-menu-eval-region-enable nil)
+  (setq axiom-menu-read-region-enable nil)
+  (setq axiom-menu-read-file-enable nil)
   (let ((schedule-cd-update nil)
         (process-buffer (current-buffer)))
     (add-hook 'comint-input-filter-functions
