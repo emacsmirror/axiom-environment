@@ -527,5 +527,4 @@
  ("XEXPPKG" . "XExponentialPackage")
  ("ZDSOLVE" . "ZeroDimensionalSolvePackage")
  ("COMPCODE" . "compCode")
- ("COMPUTIL" . "compUtil")
- ("TUT3" . "CoCoATutorial03"))
+ ("COMPUTIL" . "compUtil"))

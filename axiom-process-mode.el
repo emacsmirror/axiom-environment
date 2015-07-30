@@ -143,7 +143,8 @@ the user is part-way through editing the next command."
       (comint-send-input nil t)
       (insert pending-text))))
 
-(defun axiom-process-redirect-send-command (command output-buffer &optional display echo-cmd echo-result output-command)
+(defun axiom-process-redirect-send-command (command output-buffer &optional display echo-cmd echo-result
+                                                    op-cmd op-prompt)
   "Send COMMAND to Axiom and put result in OUTPUT-BUFFER.
 
 If DISPLAY is non-nil then display the result buffer.
@@ -151,22 +152,29 @@ If DISPLAY is non-nil then display the result buffer.
 If ECHO-CMD is non-nil then copy the command to the process buffer,
 and if ECHO-RESULT is non-nil then also copy the result too.
 
-If OUTPUT-COMMAND is non-nil then include command in output to
-OUTPUT-BUFFER."
+If OP-CMD is non-nil then include command in output to
+OUTPUT-BUFFER.  If OP-PROMPT is non-nil then also include
+prompt in output to OUTPUT-BUFFER."
   (with-current-buffer axiom-process-buffer-name
-    (save-excursion
-      (let ((proc (get-buffer-process (current-buffer))))
-        (when output-command
+    (let ((proc (get-buffer-process (current-buffer))))
+      (when op-prompt
+        (let* ((real-bol (+ (point) (save-excursion (skip-chars-backward "^\n"))))
+               (prompt (buffer-substring-no-properties real-bol (point))))
           (with-current-buffer output-buffer
-            (insert command "\n")))
-        (when echo-cmd
-          (goto-char (process-mark proc))
-          (insert-before-markers command))
-        (comint-redirect-send-command command output-buffer echo-result (not display))
-        (while (not comint-redirect-completed)
-          (accept-process-output proc))
-        (when (and echo-cmd (not echo-result))  ; get prompt back
-          (axiom-process-insert-command ""))))))
+            (goto-char (point-max))
+            (insert prompt))))
+      (when op-cmd
+        (with-current-buffer output-buffer
+          (goto-char (point-max))
+          (insert command "\n")))
+      (when echo-cmd
+        (goto-char (process-mark proc))
+        (insert-before-markers command))
+      (comint-redirect-send-command command output-buffer echo-result (not display))
+      (while (not comint-redirect-completed)
+        (accept-process-output proc))
+      (when (and echo-cmd (not echo-result))  ; get prompt back
+        (axiom-process-insert-command "")))))
 
 (defun axiom-process-get-old-input ()
   "An Axiom-specific replacement for `comint-get-old-input'.
