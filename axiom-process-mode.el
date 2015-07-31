@@ -161,11 +161,9 @@ prompt in output to OUTPUT-BUFFER."
         (let* ((real-bol (+ (point) (save-excursion (skip-chars-backward "^\n"))))
                (prompt (buffer-substring-no-properties real-bol (point))))
           (with-current-buffer output-buffer
-            (goto-char (point-max))
             (insert prompt))))
       (when op-cmd
         (with-current-buffer output-buffer
-          (goto-char (point-max))
           (insert command "\n")))
       (when echo-cmd
         (goto-char (process-mark proc))
