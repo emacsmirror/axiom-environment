@@ -2,7 +2,7 @@
 
 ;;; axiom.el -- a load-file for the axiom-environment system
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -40,11 +40,10 @@
 (require 'axiom-environment)
 
 ;; Setup auto-mode-alist
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.input" . axiom-input-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.spad" . axiom-spad-mode))
 
 ;; Uncomment this to enable axiom-selector on C-c a
 ;;(global-set-key (kbd "C-c a") 'axiom-selector)
-
-;; Uncomment this line to enable experimental org-babel Axiom support
-;;(require 'ob-axiom)

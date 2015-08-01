@@ -2,7 +2,7 @@
 
 ;;; axiom-selector.el -- a buffer selector utility for the Axiom environment
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -29,6 +29,7 @@
 Each element is a list (KEY DESCRIPTION FUNCTION), where
 DESCRIPTION is a one-line description of the command.")
 
+;;;###autoload
 (defun axiom-selector ()
   "Invoke a selector function by entering a single character.
 

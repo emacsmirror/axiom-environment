@@ -2,7 +2,7 @@
 
 ;;; ob-axiom.el --- org-babel for the axiom-environment system
 
-;; Copyright (C) Paul Onions
+;; Copyright (C) 2014 - 2015 Paul Onions
 
 ;; Author: Paul Onions
 
@@ -40,6 +40,7 @@
 
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
+;;;###autoload
 (defun org-babel-axiom-initiate-session (session params)
   "Start an Axiom session for use by org-babel."
   (unless (string= session "none")
@@ -48,21 +49,6 @@
         (if (org-babel-comint-buffer-livep session-name)
             session-name
           (axiom-process-start axiom-process-program))))))
-
-;; (defun org-babel-prep-session:axiom (session params)
-;;   "Prepare SESSION according to the header arguments specified in PARAMS.
-;; This function called by `org-babel-initiate-session'."
-;;   (org-babel-axiom-initiate-session session params))
-
-;; (defun org-babel-load-session:axiom (session body params)
-;;   "Load BODY into SESSION with PARAMS.
-;; This function called by `org-babel-load-in-session'."
-;;   (save-window-excursion
-;;     (let ((buffer (org-babel-prep-session:axiom session params)))
-;;       (with-current-buffer buffer
-;;         (goto-char (process-mark (get-buffer-process (current-buffer))))
-;;         (insert (org-babel-chomp body)))
-;;       buffer)))
 
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables.

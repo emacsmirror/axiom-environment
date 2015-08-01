@@ -143,6 +143,7 @@ the user is part-way through editing the next command."
       (comint-send-input nil t)
       (insert pending-text))))
 
+;;;###autoload
 (defun axiom-process-redirect-send-command (command output-buffer &optional display echo-cmd echo-result
                                                     op-cmd op-prompt)
   "Send COMMAND to Axiom and put result in OUTPUT-BUFFER.
@@ -182,6 +183,7 @@ continuation-lines (underscores escape new lines)."
   (comint-bol)
   (axiom-get-rest-of-line))
 
+;;;###autoload
 (defun axiom-process-find-constructor-source (name-or-abbrev)
   "Attempt to find the SPAD source for the given constructor.
 
@@ -245,11 +247,13 @@ don't display the default-directory in a message."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evaluating a region
 ;;
+;;;###autoload
 (defun axiom-process-eval-region (start end)
   "Evaluate the given region in the Axiom process."
   (interactive "r")
   (axiom-process-eval-string (buffer-substring-no-properties start end)))
 
+;;;###autoload
 (defun axiom-process-read-region (start end)
   "Copy region into a temporary file and )read it."
   (interactive "r")
@@ -264,6 +268,7 @@ don't display the default-directory in a message."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reading and compiling files
 ;;
+;;;###autoload
 (defun axiom-process-read-file (filename &optional no-display)
   "Tell the Axiom process to read FILENAME.
 
@@ -277,6 +282,7 @@ If NO-DISPLAY is nil then also display the Axiom process buffer."
         (display-buffer axiom-process-buffer-name))
       (axiom-process-insert-command (format ")read %s" (expand-file-name filename))))))
 
+;;;###autoload
 (defun axiom-process-compile-file (filename &optional no-display)
   "Tell the Axiom process to compile FILENAME.
 
@@ -390,6 +396,7 @@ buffer, otherwise do not display it."
                   (t
                    name-or-abbrev)))))
 
+;;;###autoload
 (defun axiom-process-show-constructor (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -425,6 +432,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
           (when (and popup axiom-select-popup-windows)
             (select-window popup)))))))
 
+;;;###autoload
 (defun axiom-process-show-package (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -443,6 +451,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
+;;;###autoload
 (defun axiom-process-show-domain (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -461,6 +470,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
+;;;###autoload
 (defun axiom-process-show-category (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
 
@@ -479,6 +489,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
+;;;###autoload
 (defun axiom-process-display-operation (operation-name &optional force-update)
   "Show information about OPERATION-NAME in a popup buffer.
 
@@ -511,6 +522,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
           (when (and popup axiom-select-popup-windows)
             (select-window popup)))))))
 
+;;;###autoload
 (defun axiom-process-apropos-thing-at-point (name &optional is-constructor)
   "Show information about NAME in a popup buffer.
 
@@ -535,6 +547,7 @@ prefix argument."
             (t
              (axiom-process-display-operation name t))))))
 
+;;;###autoload
 (defun axiom-process-webview-constructor (name-or-abbrev)
   "Show information about NAME-OR-ABBREV in a web browser.
 
@@ -549,6 +562,7 @@ variable `axiom-process-webview-url'."
                       ".html")))
     (browse-url url)))
 
+;;;###autoload
 (defun axiom-process-edit-constructor-source (name-or-abbrev)
   "Open the SPAD source file containing NAME-OR-ABBREV."
   (interactive (list (completing-read
@@ -578,6 +592,7 @@ variable `axiom-process-webview-url'."
         (cons axiom-standard-category-names-regexp         'axiom-process-category-face)
         (cons axiom-standard-category-abbreviations-regexp 'axiom-process-category-face)))
 
+;;;###autoload
 (define-derived-mode axiom-process-mode comint-mode "Axiom Process"
   "Major mode for interaction with a running Axiom process."
   :group 'axiom
@@ -627,6 +642,7 @@ return it."
       (axiom-process-mode))
     (current-buffer)))
 
+;;;###autoload
 (defun run-axiom (cmd)
   "Run an Axiom process in a buffer using program command line CMD.
 

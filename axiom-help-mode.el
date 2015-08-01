@@ -2,7 +2,7 @@
 
 ;;; axiom-help-mode.el -- Major mode for Axiom help descriptions
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -44,6 +44,7 @@
 (defvar axiom-help-mode-hook nil
   "Hook for customizing Axiom Help mode.")
 
+;;;###autoload
 (define-derived-mode axiom-help-mode prog-mode "Axiom Help"
   "Major mode for Axiom Help buffers."
   :group 'axiom

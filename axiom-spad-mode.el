@@ -2,7 +2,7 @@
 
 ;;; axiom-spad-mode.el -- Major mode for the Axiom library language
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -59,6 +59,7 @@
 (defvar axiom-spad-mode-hook nil
   "Hook for customizing Axiom SPAD mode.")
 
+;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"
   "Major mode for Axiom's SPAD language."
   :group 'axiom

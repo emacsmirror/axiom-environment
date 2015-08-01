@@ -2,7 +2,7 @@
 
 ;;; axiom-environment.el -- an environment for using Axiom/OpenAxiom/FriCAS
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -28,6 +28,7 @@
 (require 'axiom-spad-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
+(require 'ob-axiom)
 
 ;; Acknowledge we're loaded
 (provide 'axiom-environment)

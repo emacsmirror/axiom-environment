@@ -19,6 +19,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customizations
 ;;
+;;;###autoload
 (defgroup axiom nil
   "An environment for working with the Axiom computer algebra system.")
 

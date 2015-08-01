@@ -71,6 +71,7 @@
     (axiom-process-eval-string str)
     (axiom-move-to-next-line)))
 
+;;;###autoload
 (define-derived-mode axiom-input-mode prog-mode "Axiom Input"
   "Major mode for the Axiom-Input interactive language."
   :group 'axiom

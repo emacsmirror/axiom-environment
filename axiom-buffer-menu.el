@@ -2,7 +2,7 @@
 
 ;;; axiom-buffer-menu.el -- to display a list of Axiom buffers
 
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -272,6 +272,7 @@
       (princ "\n"))
     (goto-char axiom-buffer-menu-startpoint-cursor)))
 
+;;;###autoload
 (define-derived-mode axiom-buffer-menu-mode special-mode "Axiom Buffer Menu"
   "Major mode for giving users quick-access to Axiom buffers.
 \\<axiom-buffer-menu-mode-map>
@@ -289,6 +290,7 @@
   :group 'axiom
   (setq truncate-lines t))
 
+;;;###autoload
 (defun axiom-buffer-menu ()
   "Display a list of Axiom buffers."
   (interactive)
