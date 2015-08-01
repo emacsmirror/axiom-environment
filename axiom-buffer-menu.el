@@ -36,6 +36,9 @@
   "Face used for displaying Axiom Buffer Menu group headings"
   :group 'axiom)
 
+(defvar axiom-buffer-menu-invoking-buffer nil
+  "Buffer from which ``axiom-buffer-menu'' was invoked.")
+
 (defvar axiom-buffer-menu-startpoint-input 0
   "Starting point of Input buffer list display.")
 
@@ -132,8 +135,7 @@
   "Select the buffer whose line you click on."
   (interactive "e")
   (let (buffer)
-    (save-excursion
-      (set-buffer (window-buffer (posn-window (event-end event))))
+    (with-current-buffer (window-buffer (posn-window (event-end event)))
       (save-excursion
         (goto-char (posn-point (event-end event)))
         (setq buffer (axiom-buffer-menu-get-bufname))))
@@ -229,16 +231,14 @@
                (put-text-property heading-startpoint (point) 'face 'axiom-buffer-menu-group-heading)
                (setq axiom-buffer-menu-startpoint-help (point)))))
       (dolist (buffer (buffer-list))
-        (let (this-buffer-modified
-              this-buffer-read-only
+        (let (this-buffer-read-only
               this-buffer-name
               this-buffer-mode
               this-buffer-filename
               name-startpoint
               name-endpoint)
           (with-current-buffer buffer
-            (setq this-buffer-modified (buffer-modified-p buffer)
-                  this-buffer-read-only buffer-read-only
+            (setq this-buffer-read-only buffer-read-only
                   this-buffer-name (buffer-name)
                   this-buffer-mode major-mode
                   this-buffer-filename (buffer-file-name)))

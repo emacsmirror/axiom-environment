@@ -308,7 +308,7 @@ buffer, otherwise do not display it."
             (setq buffer-read-only t))))
       (when (and popup axiom-select-popup-windows)
         (select-window popup)
-        (end-of-buffer)))))
+        (goto-char (point-max))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Browsing/inspection utility functions
@@ -384,7 +384,7 @@ buffer, otherwise do not display it."
 (defun axiom-process-constructor-buffer-name (name-or-abbrev)
   (let ((ctype (car (axiom-process-constructor-type name-or-abbrev))))
     (format "*Axiom %s: %s*"
-            (capitalize (subseq (symbol-name ctype) 1))
+            (capitalize (cl-subseq (symbol-name ctype) 1))
             (cond ((eq ctype :package)
                    (axiom-process-package-name name-or-abbrev))
                   ((eq ctype :domain)
