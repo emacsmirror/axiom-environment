@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-spad-mode.el -- Major mode for the Axiom library language
+;;; axiom-spad-mode.el --- Major mode for the Axiom library language -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -70,3 +68,5 @@
   (setq axiom-menu-read-file-enable nil))
 
 (provide 'axiom-spad-mode)
+
+;;; axiom-spad-mode.el ends here

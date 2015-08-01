@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-process-mode.el -- a Comint-derived mode for Axiom
+;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -658,3 +656,5 @@ then simply switch to it."
     (pop-to-buffer buf)))
 
 (provide 'axiom-process-mode)
+
+;;; axiom-process-mode.el ends here

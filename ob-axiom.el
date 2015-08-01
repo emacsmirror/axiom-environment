@@ -1,23 +1,20 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; ob-axiom.el --- org-babel for the axiom-environment system
+;;; ob-axiom.el --- org-babel for the axiom-environment system -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 - 2015 Paul Onions
 
 ;; Author: Paul Onions
+;; Keywords: Axiom, OpenAxiom, FriCAS
 
 ;; This file is free software, see the LICENCE file in this directory
 ;; for copying terms.
+
+;; Package-Requires: ((emacs "24.2") (axiom-environment "20150801"))
 
 ;;; Commentary:
 
 ;; This file enables org-mode integration of the Axiom, OpenAxiom &
 ;; FriCAS computer algebra systems, by way of the axiom-environment
-;; system.
-
-;;; Requirements:
-
-;; Requires axiom-environment to be installed.
+;; package.
 
 ;;; Code:
 (require 'ob)
@@ -86,3 +83,5 @@ This function is called by `org-babel-execute-src-block'."
     name))
 
 (provide 'ob-axiom)
+
+;;; ob-axiom.el ends here

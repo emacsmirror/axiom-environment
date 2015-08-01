@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-selector.el -- a buffer selector utility for the Axiom environment
+;;; axiom-selector.el --- A buffer selector utility for the Axiom environment -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -116,3 +114,5 @@ is chosen."
   (axiom-buffer-menu))
 
 (provide 'axiom-selector)
+
+;;; axiom-selector.el ends here

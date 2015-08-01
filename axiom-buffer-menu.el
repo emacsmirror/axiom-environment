@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-buffer-menu.el -- to display a list of Axiom buffers
+;;; axiom-buffer-menu.el --- Display a list of Axiom buffers -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -300,3 +298,5 @@
   (axiom-buffer-menu-mode))
 
 (provide 'axiom-buffer-menu)
+
+;;; axiom-buffer-menu.el ends here

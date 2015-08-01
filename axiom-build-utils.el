@@ -1,8 +1,6 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; axiom-build-utils.el --- Utilities to help build the Axiom environment -*- lexical-binding: t -*-
 
-;;; axiom-build-utils.el -- utilities to help build the Axiom environment
-
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -101,3 +99,5 @@ TYPE should be either :package, :domain or :category."
   (axiom-make-standard-domain-info-file)
   (axiom-make-standard-category-info-file)
   (axiom-make-standard-operation-info-file))
+
+;;; axiom-build-utils.el ends here

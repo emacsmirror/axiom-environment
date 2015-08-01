@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-base.el -- basic setup for the Axiom environment
+;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -402,3 +400,5 @@ continuation-lines (underscores escape new lines)."
   (load "axiom-selector"))
 
 (provide 'axiom-base)
+
+;;; axiom-base.el ends here

@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-input-mode.el -- Major mode for the Axiom interactive language
+;;; axiom-input-mode.el --- Major mode for the Axiom interactive language -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -82,3 +80,5 @@
   (setq axiom-menu-read-file-enable t))
 
 (provide 'axiom-input-mode)
+
+;;; axiom-input-mode.el ends here

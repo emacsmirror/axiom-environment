@@ -1,6 +1,4 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
-
-;;; axiom-help-mode.el -- Major mode for Axiom help descriptions
+;;; axiom-help-mode.el --- Major mode for Axiom help descriptions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 - 2015 Paul Onions
 
@@ -55,3 +53,5 @@
   (setq axiom-menu-read-file-enable nil))
 
 (provide 'axiom-help-mode)
+
+;;; axiom-help-mode.el ends here
