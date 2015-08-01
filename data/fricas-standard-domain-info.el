@@ -1,3 +1,4 @@
+;; -*-no-byte-compile: t; -*-
 (("ALGSC" . "AlgebraGivenByStructuralConstants")
  ("ALGFF" . "AlgebraicFunctionField")
  ("AN" . "AlgebraicNumber")

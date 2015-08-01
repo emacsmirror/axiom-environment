@@ -78,6 +78,7 @@ by specifying a different path in the FILENAME string (either
 relative or absolute)."
   (let ((default-directory axiom-environment-data-dir))
     (with-temp-buffer
+      (insert ";; -*-no-byte-compile: t; -*-\n")
       (pp obj (current-buffer))
       (write-region (point-min) (point-max) filename))))
 

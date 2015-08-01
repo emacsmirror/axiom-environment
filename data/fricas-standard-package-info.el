@@ -1,3 +1,4 @@
+;; -*-no-byte-compile: t; -*-
 (("ALGFACT" . "AlgFactor")
  ("ALGPKG" . "AlgebraPackage")
  ("AF" . "AlgebraicFunction")

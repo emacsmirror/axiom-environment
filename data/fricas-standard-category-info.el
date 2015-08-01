@@ -1,3 +1,4 @@
+;; -*-no-byte-compile: t; -*-
 (("ABELGRP" . "AbelianGroup")
  ("AMR" . "AbelianMonoidRing")
  ("ABELMON" . "AbelianMonoid")
