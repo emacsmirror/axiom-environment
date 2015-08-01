@@ -40,7 +40,6 @@
 
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
-;;;###autoload
 (defun org-babel-axiom-initiate-session (session params)
   "Start an Axiom session for use by org-babel."
   (unless (string= session "none")

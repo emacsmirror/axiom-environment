@@ -28,7 +28,6 @@
 (require 'axiom-spad-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
-(require 'ob-axiom)
 
 ;; Acknowledge we're loaded
 (provide 'axiom-environment)
