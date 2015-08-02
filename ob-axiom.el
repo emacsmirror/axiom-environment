@@ -34,6 +34,7 @@
 
 ;; Configure org editing options
 (add-to-list 'org-src-lang-modes '("axiom" . axiom-input))
+(add-to-list 'org-src-lang-modes '("spad" . axiom-spad))
 
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
