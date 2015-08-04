@@ -21,14 +21,14 @@ The main features of these modes (so far) are syntax highlighting to
 display package, domain & category names (and their abbreviations) in
 distinct colours, and to give quick access to popup buffers displaying
 summary information about these types and their operations.  The
-syntax highlighting feature allows us to see at a glance which
-``level'' of the type system we are concerned with (domains or
-categories), and the popup buffer feature allows us to examine (and
-re-examine) these types without interupting our workflow
-(i.e. interaction in the Axiom REPL).  Hint: to make a popup help
-buffer go away, press ``q'', emacs's window configuration will be
-restored to what it was before the help window appeared and the help
-buffer will be buried in the buffer list.
+syntax highlighting feature allows us to see at a glance which aspect
+of the type system we are concerned with (domains or categories), and
+the popup buffer feature allows us to examine (and re-examine) these
+types without interupting our workflow (i.e. interaction in the Axiom
+REPL).  Hint: to make a popup help buffer go away, press ``q'',
+emacs's window configuration will be restored to what it was before
+the help window appeared and the help buffer will be buried in the
+buffer list.
 
 The ``ob-axiom'' package is an org-babel extension that integrates the
 axiom-environment into org-mode, allowing a literate development &
@@ -135,4 +135,4 @@ and enter the details there.
 
 --
 Paul Onions
-2 August 2015
+4 August 2015

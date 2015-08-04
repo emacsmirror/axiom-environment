@@ -12,9 +12,10 @@
 
 ;;; Commentary:
 
-;; This file enables org-mode integration of the Axiom, OpenAxiom &
-;; FriCAS computer algebra systems, by way of the axiom-environment
-;; package.
+;; The ``ob-axiom'' package is an org-babel extension that integrates
+;; the axiom-environment into org-mode, allowing a literate
+;; development & presentation style with easy publishing to HTML, PDF,
+;; etc.
 
 ;;; Code:
 (require 'ob)

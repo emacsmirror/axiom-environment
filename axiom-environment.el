@@ -12,12 +12,35 @@
 
 ;;; Commentary:
 
-;; To use this system, ensure this directory is in your `load-path',
-;; and put
-;;
-;;   (require 'axiom-environment)
-;;
-;; into your .emacs file.
+;; The ``axiom-environment'' package is intended to make it easier to
+;; work with, and understand, the Axiom, OpenAxiom and FriCAS computer
+;; algebra systems.  It implements four different major modes for the
+;; Emacs text editor:
+
+;;   1. axiom-process-mode: for interaction with a running Axiom
+;;   process.
+
+;;   2. axiom-help-mode: for displaying help information about the
+;;      Axiom system.
+  
+;;   3. axiom-input-mode: for editing a .input (Axiom script) file.
+
+;;   4. axiom-spad-mode: for editing Axiom library code written in the
+;;      SPAD language.
+
+;; The main features of these modes (so far) are syntax highlighting
+;; to display package, domain & category names (and their
+;; abbreviations) in distinct colours, and to give quick access to
+;; popup buffers displaying summary information about these types and
+;; their operations.  The syntax highlighting feature allows us to see
+;; at a glance which aspect of the type system we are concerned with
+;; (domains or categories), and the popup buffer feature allows us to
+;; examine (and re-examine) these types without interupting our
+;; workflow (i.e. interaction in the Axiom REPL).  Hint: to make a
+;; popup help buffer go away, press ``q'', emacs's window
+;; configuration will be restored to what it was before the help
+;; window appeared and the help buffer will be buried in the buffer
+;; list.
 
 ;;; Code:
 
