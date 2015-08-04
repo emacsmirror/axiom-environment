@@ -26,19 +26,29 @@
 (require 'axiom-environment)
 
 ;; Header arguments
+;;;###autoload
 (defconst org-babel-header-args:axiom '())
 
+;;;###autoload
 (defvar org-babel-default-header-args:axiom '((:session . "Axiom Org-Babel Session")))
 
 ;; File extension for Axiom Input files
+;;;###autoload
 (add-to-list 'org-babel-tangle-lang-exts '("axiom" . "input"))
 
+;;;###autoload
+(add-to-list 'org-babel-tangle-lang-exts '("spad" . "spad"))
+
 ;; Configure org editing options
+;;;###autoload
 (add-to-list 'org-src-lang-modes '("axiom" . axiom-input))
+
+;;;###autoload
 (add-to-list 'org-src-lang-modes '("spad" . axiom-spad))
 
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
+;;;###autoload
 (defun org-babel-axiom-initiate-session (session params)
   "Start an Axiom session for use by org-babel."
   (unless (string= session "none")
@@ -48,18 +58,21 @@
             session-name
           (axiom-process-start axiom-process-program))))))
 
+;;;###autoload
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables.
 This function called by `org-babel-expand-src-block'."
   (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
     (mapcar (lambda (pair) (format "%S := %S" (car pair) (cdr pair))) vars)))
 
+;;;###autoload
 (defun org-babel-expand-body:axiom (body params)
   "Expand BODY with PARAMS."
   (mapconcat #'identity (append (org-babel-variable-assignments:axiom params)
                                 (list body))
              "\n"))
 
+;;;###autoload
 (defun org-babel-execute:axiom (body params)
   "Execute a block of Axiom code with org-babel.
 This function is called by `org-babel-execute-src-block'."
