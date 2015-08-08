@@ -166,7 +166,7 @@ prompt in output to OUTPUT-BUFFER."
           (insert command "\n")))
       (when echo-cmd
         (goto-char (process-mark proc))
-        (insert-before-markers command))
+        (insert-before-markers command "\n"))
       (comint-redirect-send-command command output-buffer echo-result (not display))
       (while (not comint-redirect-completed)
         (accept-process-output proc))
