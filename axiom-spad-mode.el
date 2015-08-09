@@ -63,8 +63,8 @@
   :group 'axiom
   (setq font-lock-defaults (list axiom-spad-font-lock-keywords))
   (setq axiom-menu-compile-file-enable t)
-  (setq axiom-menu-eval-region-enable nil)
-  (setq axiom-menu-read-region-enable nil)
+  (setq axiom-menu-eval-region-enable t)
+  (setq axiom-menu-read-region-enable t)
   (setq axiom-menu-read-file-enable nil))
 
 (provide 'axiom-spad-mode)
