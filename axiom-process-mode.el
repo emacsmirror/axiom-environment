@@ -45,7 +45,7 @@ Must begin and end with an asterisk."
   :group 'axiom)
 
 (defcustom axiom-process-compile-file-result-directory ""
-  "Directory in which to place compilation results.
+  "Directory in which to place compiled object files.
 
 Only used when variable
 `axiom-process-compile-file-use-result-directory' is non-NIL."
@@ -55,9 +55,10 @@ Only used when variable
 (defcustom axiom-process-compile-file-use-result-directory nil
   "Non-nil to place compilation results in a central directory.
 
-When non-nil place results in the directory named by variable
-`axiom-process-compile-file-result-directory', otherwise they will be
-placed in the same directory as the source file."
+When non-nil place compiled object files in the directory named
+by variable `axiom-process-compile-file-result-directory',
+otherwise they will be placed in the same directory as the source
+file."
   :type 'boolean
   :group 'axiom)
 
