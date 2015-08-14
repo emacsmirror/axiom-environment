@@ -281,6 +281,20 @@ If NO-DISPLAY is nil then also display the Axiom process buffer."
       (axiom-process-insert-command (format ")read %s" (expand-file-name filename))))))
 
 ;;;###autoload
+(defun axiom-process-read-buffer (&optional no-display)
+  "Read the current buffer into the Axiom process.
+
+If NO-DISPLAY is nil then also display the Axiom process buffer."
+  (interactive "P")
+  (let ((file (if (and (buffer-file-name)
+                       (not (buffer-modified-p)))
+                  (buffer-file-name)
+                (let ((tmp-file (make-temp-file "axiom" nil ".input")))
+                  (write-region (point-min) (point-max) tmp-file)
+                  tmp-file))))
+    (axiom-process-read-file file no-display)))
+
+;;;###autoload
 (defun axiom-process-compile-file (filename &optional no-display)
   "Tell the Axiom process to compile FILENAME.
 
@@ -290,25 +304,40 @@ buffer, otherwise do not display it."
                      current-prefix-arg))
   (if (not (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
-    (let ((popup (unless no-display
-                   (display-buffer (get-buffer-create axiom-process-compile-file-buffer-name)))))
-      (with-current-buffer axiom-process-buffer-name
-        (let ((current-dir (axiom-process-force-cd-update t))
-              (result-dir (if axiom-process-compile-file-use-result-directory
-                              (file-name-as-directory (expand-file-name axiom-process-compile-file-result-directory))
-                            (file-name-directory (expand-file-name filename)))))
-          (with-current-buffer (get-buffer-create axiom-process-compile-file-buffer-name)
-            (setq buffer-read-only nil)
-            (erase-buffer)
-            (axiom-help-mode)
-            (axiom-process-redirect-send-command (format ")cd %s" result-dir) (current-buffer) (not no-display))
-            (axiom-process-redirect-send-command (format ")compile %s" (expand-file-name filename)) (current-buffer) (not no-display))
-            (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))
-            (set-buffer-modified-p nil)
-            (setq buffer-read-only t))))
-      (when (and popup axiom-select-popup-windows)
-        (select-window popup)
-        (goto-char (point-max))))))
+    (with-current-buffer axiom-process-buffer-name
+      (let ((current-dir (axiom-process-force-cd-update t))
+            (result-dir (if axiom-process-compile-file-use-result-directory
+                            (file-name-as-directory (expand-file-name axiom-process-compile-file-result-directory))
+                          (file-name-directory (expand-file-name filename)))))
+        (with-current-buffer (get-buffer-create axiom-process-compile-file-buffer-name)
+          (unless no-display
+            (display-buffer axiom-process-compile-file-buffer-name))
+          (setq buffer-read-only nil)
+          (erase-buffer)
+          (axiom-help-mode)
+          (axiom-process-redirect-send-command (format ")cd %s" result-dir) (current-buffer) (not no-display))
+          (axiom-process-redirect-send-command (format ")compile %s" (expand-file-name filename)) (current-buffer) (not no-display))
+          (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))
+          (set-buffer-modified-p nil)
+          (setq buffer-read-only t))))
+      (when (and axiom-select-popup-windows (not no-display))
+        (select-window (display-buffer axiom-process-compile-file-buffer-name))
+        (goto-char (point-max)))))
+
+;;;###autoload
+(defun axiom-process-compile-buffer (&optional no-display)
+  "Compile the current buffer in the Axiom process.
+
+If NO-DISPLAY is nil then display the Axiom compilation results
+buffer, otherwise do not display it."
+  (interactive "P")
+  (let ((file (if (and (buffer-file-name)
+                       (not (buffer-modified-p)))
+                  (buffer-file-name)
+                (let ((tmp-file (make-temp-file "axiom" nil ".spad")))
+                  (write-region (point-min) (point-max) tmp-file)
+                  tmp-file))))
+    (axiom-process-compile-file file no-display)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Browsing/inspection utility functions
@@ -598,10 +627,12 @@ variable `axiom-process-webview-url'."
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
   (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
-  (setq axiom-menu-compile-file-enable nil)
-  (setq axiom-menu-eval-region-enable nil)
-  (setq axiom-menu-read-region-enable nil)
-  (setq axiom-menu-read-file-enable nil)
+  (setq axiom-menu-compile-buffer-enable nil)
+  (setq axiom-menu-compile-file-enable t)
+  (setq axiom-menu-read-buffer-enable nil)
+  (setq axiom-menu-read-file-enable t)
+  (setq axiom-menu-read-region-enable t)
+  (setq axiom-menu-eval-region-enable t)
   (let ((schedule-cd-update nil)
         (process-buffer (current-buffer)))
     (add-hook 'comint-input-filter-functions

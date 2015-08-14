@@ -257,15 +257,21 @@ string (either relative or absolute)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common keymap (including the ``Axiom'' menu)
 ;;
-(defvar axiom-menu-compile-file-enable nil)
-(defvar axiom-menu-read-file-enable nil)
-(defvar axiom-menu-eval-region-enable nil)
-(defvar axiom-menu-read-region-enable nil)
+(defvar axiom-menu-compile-buffer-enable nil)
+(defvar axiom-menu-compile-file-enable   nil)
 
+(defvar axiom-menu-read-buffer-enable nil)
+(defvar axiom-menu-read-file-enable   nil)
+(defvar axiom-menu-read-region-enable nil)
+(defvar axiom-menu-eval-region-enable nil)
+
+(make-variable-buffer-local 'axiom-menu-compile-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-compile-file-enable)
+
+(make-variable-buffer-local 'axiom-menu-read-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-read-file-enable)
-(make-variable-buffer-local 'axiom-menu-eval-region-enable)
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
+(make-variable-buffer-local 'axiom-menu-eval-region-enable)
 
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
@@ -278,32 +284,40 @@ string (either relative or absolute)."
     (define-key map (kbd "C-c C-d k") 'axiom-process-show-constructor)
     (define-key map (kbd "C-c C-d o") 'axiom-process-display-operation)
     (define-key map (kbd "C-c C-d a") 'axiom-process-apropos-thing-at-point)
-    (define-key map (kbd "C-c C-w") 'axiom-process-webview-constructor)
-    (define-key map (kbd "C-c C-s") 'axiom-process-edit-constructor-source)
-    (define-key map (kbd "C-c C-k") 'axiom-process-compile-file)
-    (define-key map (kbd "C-c C-r") 'axiom-process-read-file)
-    (define-key map (kbd "C-c C-e") 'axiom-process-eval-region)
-    (define-key map (kbd "C-c C-y") 'axiom-process-read-region)
+    (define-key map (kbd "C-c C-w")   'axiom-process-webview-constructor)
+    (define-key map (kbd "C-c C-s")   'axiom-process-edit-constructor-source)
+    (define-key map (kbd "C-c C-b k") 'axiom-process-compile-buffer)
+    (define-key map (kbd "C-c C-k")   'axiom-process-compile-file)
+    (define-key map (kbd "C-c C-b r") 'axiom-process-read-buffer)
+    (define-key map (kbd "C-c C-r")   'axiom-process-read-file)
+    (define-key map (kbd "C-c C-y")   'axiom-process-read-region)
+    (define-key map (kbd "C-c C-e")   'axiom-process-eval-region)
     ;; Menu items
     (define-key map [menu-bar axiom-menu] (cons "Axiom" menu-map))
     (define-key menu-map [axiom-menu-run-axiom]
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
-    (define-key menu-map [axiom-menu-read-file]
-      '(menu-item "Read File..." axiom-process-read-file
-                  :enable axiom-menu-read-file-enable))
-    (define-key menu-map [axiom-menu-read-region]
-      '(menu-item "Read Region" axiom-process-read-region
-                  :enable axiom-menu-read-region-enable))
     (define-key menu-map [axiom-menu-eval-region]
       '(menu-item "Eval Region" axiom-process-eval-region
                   :enable axiom-menu-eval-region-enable))
+    (define-key menu-map [axiom-menu-read-region]
+      '(menu-item "Read Region" axiom-process-read-region
+                  :enable axiom-menu-read-region-enable))
+    (define-key menu-map [axiom-menu-read-file]
+      '(menu-item "Read File..." axiom-process-read-file
+                  :enable axiom-menu-read-file-enable))
+    (define-key menu-map [axiom-menu-read-buffer]
+      '(menu-item "Read Buffer..." axiom-process-read-buffer
+                  :enable axiom-menu-read-buffer-enable))
     (define-key menu-map [axiom-menu-separator-2]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-compile-file]
       '(menu-item "Compile File..." axiom-process-compile-file
                   :enable axiom-menu-compile-file-enable))
+    (define-key menu-map [axiom-menu-compile-buffer]
+      '(menu-item "Compile Buffer" axiom-process-compile-buffer
+                  :enable axiom-menu-compile-buffer-enable))
     (define-key menu-map [axiom-menu-separator-1]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-webview-constructor]
