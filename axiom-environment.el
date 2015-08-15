@@ -32,31 +32,31 @@
 ;; to display package, domain & category names (and their
 ;; abbreviations) in distinct colours, and to give quick access to
 ;; popup buffers displaying summary information about these types and
-;; their operations.  The syntax highlighting feature allows us to see
+;; their operations.  The syntax highlighting feature allows to see
 ;; at a glance which aspect of the type system we are concerned with
-;; (domains or categories), and the popup buffer feature allows us to
-;; examine (and re-examine) these types without interupting our
-;; workflow (i.e. interaction in the Axiom REPL).  Hint: to make a
-;; popup help buffer go away, press ``q'', emacs's window
-;; configuration will be restored to what it was before the help
-;; window appeared and the help buffer will be buried in the buffer
-;; list.
+;; (domains or categories), and the popup buffer feature allows to
+;; examine (and re-examine) these types without interupting the
+;; workflow (i.e. interaction in the Axiom REPL).
 
 ;;; Code:
 
 ;; Load everything
+(require 'axiom-base)
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
 (require 'axiom-input-mode)
 (require 'axiom-spad-mode)
+(require 'axiom-boot-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
 
-;; Automatically put .input and .spad files into the correct major mode.
+;; Automatically put .input, .spad and .boot files into the correct major mode.
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.input" . axiom-input-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.spad" . axiom-spad-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.boot" . axiom-boot-mode))
 
 ;; Acknowledge we're loaded
 (provide 'axiom-environment)
