@@ -228,7 +228,7 @@ string (either relative or absolute)."
 (defvar axiom-common-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?_ "\\" table)
-    (modify-syntax-entry ?+ ". 12" table)
+    (modify-syntax-entry ?+ ". " table)
     (modify-syntax-entry ?- ". 12" table)
     (modify-syntax-entry ?\n ">" table)
     (modify-syntax-entry ?\t " " table)

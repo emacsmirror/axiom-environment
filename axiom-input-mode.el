@@ -16,6 +16,10 @@
 
 (require 'axiom-base)
 
+(defface axiom-input-doc-comment '((t (:foreground "dark magenta")))
+  "Face used for displaying input documentation comments."
+  :group 'axiom)
+
 (defface axiom-input-keyword '((t (:foreground "grey25")))
   "Face used for displaying input file keywords."
   :group 'axiom)
@@ -23,6 +27,10 @@
 (defvar axiom-input-mode-syntax-table
   (copy-syntax-table axiom-common-syntax-table)
   "The Axiom input mode syntax table.")
+
+(defvar axiom-input-doc-comment-regexp
+  "\\+\\+.*$"
+  "An Axiom documentation comment.")
 
 (defvar axiom-input-keyword-names
   (list "has"
@@ -33,13 +41,15 @@
   (concat "\\<" (regexp-opt axiom-input-keyword-names) "\\>")
   "Regular expression for input file keywords.")
 
-(defvar axiom-input-keyword-face  'axiom-input-keyword)
-(defvar axiom-input-package-face  'axiom-package-name)
-(defvar axiom-input-domain-face   'axiom-domain-name)
-(defvar axiom-input-category-face 'axiom-category-name)
+(defvar axiom-input-doc-comment-face 'axiom-input-doc-comment)
+(defvar axiom-input-keyword-face     'axiom-input-keyword)
+(defvar axiom-input-package-face     'axiom-package-name)
+(defvar axiom-input-domain-face      'axiom-domain-name)
+(defvar axiom-input-category-face    'axiom-category-name)
 
 (defvar axiom-input-font-lock-keywords
-  (list (cons axiom-input-keywords-regexp                  'axiom-input-keyword-face)
+  (list (cons axiom-input-doc-comment-regexp               'axiom-input-doc-comment-face)
+        (cons axiom-input-keywords-regexp                  'axiom-input-keyword-face)
         (cons axiom-standard-package-names-regexp          'axiom-input-package-face)
         (cons axiom-standard-package-abbreviations-regexp  'axiom-input-package-face)
         (cons axiom-standard-domain-names-regexp           'axiom-input-domain-face)
