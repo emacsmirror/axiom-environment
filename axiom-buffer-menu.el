@@ -75,9 +75,7 @@
 
 (defun axiom-buffer-menu-quit ()
   (interactive)
-  (kill-this-buffer)
-  (when axiom-buffer-menu-invoking-buffer
-    (switch-to-buffer axiom-buffer-menu-invoking-buffer)))
+  (quit-window))
 
 (defun axiom-buffer-menu-get-bufname ()
   "Return name of buffer described by current line of buffer-menu."
@@ -268,6 +266,7 @@
               (princ (abbreviate-file-name this-buffer-filename)))
             (princ "\n"))))
       (princ "\n"))
+    (axiom-buffer-menu-mode)
     (goto-char axiom-buffer-menu-startpoint-cursor)))
 
 ;;;###autoload
@@ -294,8 +293,9 @@
   (interactive)
   (setq axiom-buffer-menu-invoking-buffer (current-buffer))
   (axiom-buffer-menu-prepare-buffer)
-  (switch-to-buffer axiom-buffer-menu-bufname)
-  (axiom-buffer-menu-mode))
+  (let ((popup (display-buffer axiom-buffer-menu-bufname '(display-buffer-same-window) t)))
+    (when (and popup axiom-select-popup-windows)
+      (select-window popup))))
 
 (provide 'axiom-buffer-menu)
 
