@@ -240,7 +240,7 @@ don't display the default-directory in a message."
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
     (progn
-      (display-buffer axiom-process-buffer-name)
+      (display-buffer axiom-process-buffer-name nil t)
       (axiom-process-insert-command str))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -259,7 +259,7 @@ don't display the default-directory in a message."
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
     (progn
-      (display-buffer axiom-process-buffer-name)
+      (display-buffer axiom-process-buffer-name nil t)
       (let ((tmp-filename (make-temp-file "axiom" nil ".input")))
         (write-region start end tmp-filename)
         (axiom-process-insert-command (format ")read %s" tmp-filename))))))
@@ -278,7 +278,7 @@ If NO-DISPLAY is nil then also display the Axiom process buffer."
       (message axiom-process-not-running-message)
     (progn
       (unless no-display
-        (display-buffer axiom-process-buffer-name))
+        (display-buffer axiom-process-buffer-name nil t))
       (axiom-process-insert-command (format ")read %s" (expand-file-name filename))))))
 
 ;;;###autoload
@@ -312,7 +312,7 @@ buffer, otherwise do not display it."
                           (file-name-directory (expand-file-name filename)))))
         (with-current-buffer (get-buffer-create axiom-process-compile-file-buffer-name)
           (unless no-display
-            (display-buffer axiom-process-compile-file-buffer-name))
+            (display-buffer axiom-process-compile-file-buffer-name nil t))
           (setq buffer-read-only nil)
           (erase-buffer)
           (axiom-help-mode)
@@ -322,7 +322,7 @@ buffer, otherwise do not display it."
           (set-buffer-modified-p nil)
           (setq buffer-read-only t))))
       (when (and axiom-select-popup-windows (not no-display))
-        (select-window (display-buffer axiom-process-compile-file-buffer-name))
+        (select-window (display-buffer axiom-process-compile-file-buffer-name nil t))
         (goto-char (point-max)))))
 
 ;;;###autoload
@@ -456,7 +456,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
             (axiom-process-redirect-send-command (format ")show %s" name-or-abbrev) (current-buffer) t nil nil)
             (set-buffer-modified-p nil)
             (setq buffer-read-only t)))
-        (let ((popup (display-buffer bufname)))
+        (let ((popup (display-buffer bufname nil t)))
           (when (and popup axiom-select-popup-windows)
             (select-window popup)))))))
 
@@ -546,7 +546,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
             (axiom-process-redirect-send-command (format ")display operation %s" operation-name) (current-buffer) t nil nil)
             (set-buffer-modified-p nil)
             (setq buffer-read-only t)))
-        (let ((popup (display-buffer bufname)))
+        (let ((popup (display-buffer bufname nil t)))
           (when (and popup axiom-select-popup-windows)
             (select-window popup)))))))
 

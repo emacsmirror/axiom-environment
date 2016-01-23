@@ -72,7 +72,7 @@ is chosen."
     (dolist (entry axiom-selector-functions)
       (insert (format "%c:\t%s\n" (first entry) (second entry))))
     (help-mode)
-    (display-buffer (current-buffer) t)
+    (display-buffer (current-buffer) nil t)
     (shrink-window-if-larger-than-buffer 
      (get-buffer-window (current-buffer))))
   (axiom-selector)
