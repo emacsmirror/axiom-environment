@@ -66,6 +66,7 @@ specifying a var of the same value."
       (concat "[" (mapconcat #'org-babel-axiom-var-to-axiom val ", ") "]")
     (format "%S" val)))
 
+;;;###autoload
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables.
 This function called by `org-babel-expand-src-block'."
