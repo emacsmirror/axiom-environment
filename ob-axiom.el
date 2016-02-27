@@ -59,11 +59,21 @@
           (axiom-process-start axiom-process-program))))))
 
 ;;;###autoload
+(defun org-babel-axiom-var-to-axiom (val)
+  "Convert an elisp var into a string of Axiom source code
+specifying a var of the same value."
+  (if (listp val)
+      (concat "[" (mapconcat #'org-babel-axiom-var-to-axiom val ", ") "]")
+    (format "%S" val)))
+
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables.
 This function called by `org-babel-expand-src-block'."
   (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
-    (mapcar (lambda (pair) (format "%S := %S" (car pair) (cdr pair))) vars)))
+    (mapcar
+     (lambda (pair)
+       (format "%S := %s" (car pair) (org-babel-axiom-var-to-axiom (cdr pair))))
+     vars)))
 
 ;;;###autoload
 (defun org-babel-expand-body:axiom (body params)
