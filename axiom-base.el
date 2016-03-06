@@ -1,8 +1,6 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;;; axiom-base.el -- basic setup for the Axiom environment
-
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -19,8 +17,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customizations
 ;;
+;;;###autoload
 (defgroup axiom nil
   "An environment for working with the Axiom computer algebra system.")
+
+(defcustom axiom-select-popup-windows t
+  "Set non-nil to automatically switch to popup windows."
+  :type 'boolean
+  :group 'axiom)
 
 (defcustom axiom-standard-package-info-file "fricas-standard-package-info.el"
   "File from which to `read' standard package information."
@@ -66,7 +70,7 @@
   "Axiom environment data directory.")
 
 (defun axiom-write-data-file (obj filename)
-  "Write OBJ to FILENAME using function `print'.
+  "Write OBJ to FILENAME using function `pp', the pretty-printer.
 
 The directory in which to write the file defaults to the value of
 the variable `axiom-environment-data-dir'. This can be overridden
@@ -74,7 +78,8 @@ by specifying a different path in the FILENAME string (either
 relative or absolute)."
   (let ((default-directory axiom-environment-data-dir))
     (with-temp-buffer
-      (print obj (current-buffer))
+      (insert ";; -*-no-byte-compile: t; -*-\n")
+      (pp obj (current-buffer))
       (write-region (point-min) (point-max) filename))))
 
 (defun axiom-read-data-file (filename)
@@ -223,7 +228,7 @@ string (either relative or absolute)."
 (defvar axiom-common-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?_ "\\" table)
-    (modify-syntax-entry ?+ ". 12" table)
+    (modify-syntax-entry ?+ ". " table)
     (modify-syntax-entry ?- ". 12" table)
     (modify-syntax-entry ?\n ">" table)
     (modify-syntax-entry ?\t " " table)
@@ -252,15 +257,21 @@ string (either relative or absolute)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common keymap (including the ``Axiom'' menu)
 ;;
-(defvar axiom-menu-compile-file-enable nil)
-(defvar axiom-menu-read-file-enable nil)
-(defvar axiom-menu-eval-region-enable nil)
-(defvar axiom-menu-read-region-enable nil)
+(defvar axiom-menu-compile-buffer-enable nil)
+(defvar axiom-menu-compile-file-enable   nil)
 
+(defvar axiom-menu-read-buffer-enable nil)
+(defvar axiom-menu-read-file-enable   nil)
+(defvar axiom-menu-read-region-enable nil)
+(defvar axiom-menu-eval-region-enable nil)
+
+(make-variable-buffer-local 'axiom-menu-compile-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-compile-file-enable)
+
+(make-variable-buffer-local 'axiom-menu-read-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-read-file-enable)
-(make-variable-buffer-local 'axiom-menu-eval-region-enable)
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
+(make-variable-buffer-local 'axiom-menu-eval-region-enable)
 
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
@@ -273,31 +284,47 @@ string (either relative or absolute)."
     (define-key map (kbd "C-c C-d k") 'axiom-process-show-constructor)
     (define-key map (kbd "C-c C-d o") 'axiom-process-display-operation)
     (define-key map (kbd "C-c C-d a") 'axiom-process-apropos-thing-at-point)
-    (define-key map (kbd "C-c C-k") 'axiom-process-compile-file)
-    (define-key map (kbd "C-c C-r") 'axiom-process-read-file)
-    (define-key map (kbd "C-c C-e") 'axiom-process-eval-region)
-    (define-key map (kbd "C-c C-y") 'axiom-process-read-region)
+    (define-key map (kbd "C-c C-w")   'axiom-process-webview-constructor)
+    (define-key map (kbd "C-c C-s")   'axiom-process-edit-constructor-source)
+    (define-key map (kbd "C-c C-b k") 'axiom-process-compile-buffer)
+    (define-key map (kbd "C-c C-k")   'axiom-process-compile-file)
+    (define-key map (kbd "C-c C-b r") 'axiom-process-read-buffer)
+    (define-key map (kbd "C-c C-r")   'axiom-process-read-file)
+    (define-key map (kbd "C-c C-y")   'axiom-process-read-region)
+    (define-key map (kbd "C-c C-e")   'axiom-process-eval-region)
     ;; Menu items
     (define-key map [menu-bar axiom-menu] (cons "Axiom" menu-map))
     (define-key menu-map [axiom-menu-run-axiom]
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
-    (define-key menu-map [axiom-menu-read-file]
-      '(menu-item "Read File..." axiom-process-read-file
-                  :enable axiom-menu-read-file-enable))
-    (define-key menu-map [axiom-menu-read-region]
-      '(menu-item "Read Region..." axiom-process-read-region
-                  :enable axiom-menu-read-region-enable))
     (define-key menu-map [axiom-menu-eval-region]
       '(menu-item "Eval Region" axiom-process-eval-region
                   :enable axiom-menu-eval-region-enable))
+    (define-key menu-map [axiom-menu-read-region]
+      '(menu-item "Read Region" axiom-process-read-region
+                  :enable axiom-menu-read-region-enable))
+    (define-key menu-map [axiom-menu-read-file]
+      '(menu-item "Read File..." axiom-process-read-file
+                  :enable axiom-menu-read-file-enable))
+    (define-key menu-map [axiom-menu-read-buffer]
+      '(menu-item "Read Buffer..." axiom-process-read-buffer
+                  :enable axiom-menu-read-buffer-enable))
     (define-key menu-map [axiom-menu-separator-2]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-compile-file]
       '(menu-item "Compile File..." axiom-process-compile-file
                   :enable axiom-menu-compile-file-enable))
+    (define-key menu-map [axiom-menu-compile-buffer]
+      '(menu-item "Compile Buffer" axiom-process-compile-buffer
+                  :enable axiom-menu-compile-buffer-enable))
     (define-key menu-map [axiom-menu-separator-1]
+      '(menu-item "--"))
+    (define-key menu-map [axiom-menu-webview-constructor]
+      '(menu-item "View Constructor Web Doc..." axiom-process-webview-constructor))
+    (define-key menu-map [axiom-menu-edit-constructor-source]
+      '(menu-item "Find Constructor Source..." axiom-process-edit-constructor-source))
+    (define-key menu-map [axiom-menu-separator-0]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-apropos]
       '(menu-item "Apropos (at point)..." axiom-process-apropos-thing-at-point))
@@ -313,6 +340,59 @@ string (either relative or absolute)."
       '(menu-item "Show Package..." axiom-process-show-package))
     map)
   "The Axiom environment keymap.")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;
+(defun axiom-move-to-next-line ()
+  "Move to beginning of next line.
+
+Move beyond current line and all subsequent
+continuation-lines (underscores escape new lines) to the beginning
+of the next non-blank line."
+  (let ((posn nil)
+        (n 1)
+        (done nil))
+    (while (not done)
+      (let ((p (line-end-position n)))
+        (cond ((eql p posn)
+               (setq done t))
+              ((eql (char-before p) ?_)
+               (setq posn p)
+               (incf n))
+              (t
+               (setq posn p)
+               (setq done t)))))
+    (goto-char posn)
+    (re-search-forward "^.+$")
+    (beginning-of-line)))
+
+(defun axiom-get-rest-of-line ()
+  "Return the remainder of the current line.
+
+Return a string containing the remainder of the current
+line (from point), and the concatenation of all subsequent
+continuation-lines (underscores escape new lines)."
+  (let ((posns nil)
+        (n 1)
+        (done nil))
+    (while (not done)
+      (let ((p (line-end-position n)))
+        (cond ((eql p (car posns))
+               (setq done t))
+              ((eql (char-before p) ?_)
+               (push p posns)
+               (incf n))
+              (t
+               (push p posns)
+               (setq done t)))))
+    (let ((line "")
+          (beg (point)))
+      (dolist (end (reverse posns))
+        (let ((end-excl-underscore (if (eql (char-before end) ?_) (1- end) end)))
+          (setq line (concat line (buffer-substring-no-properties beg end-excl-underscore))))
+        (setq beg (1+ end)))
+      line)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Developer utils
@@ -335,3 +415,5 @@ string (either relative or absolute)."
   (load "axiom-selector"))
 
 (provide 'axiom-base)
+
+;;; axiom-base.el ends here

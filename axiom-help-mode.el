@@ -1,8 +1,6 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; axiom-help-mode.el --- Major mode for Axiom help descriptions -*- lexical-binding: t -*-
 
-;;; axiom-help-mode.el -- Major mode for Axiom help descriptions
-
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -37,16 +35,25 @@
 (defvar axiom-help-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map axiom-common-keymap)
-    (define-key map (kbd "q") 'bury-buffer)
+    (define-key map (kbd "q") 'quit-window)
     map)
   "The Axiom Help mode local keymap.")
 
 (defvar axiom-help-mode-hook nil
   "Hook for customizing Axiom Help mode.")
 
+;;;###autoload
 (define-derived-mode axiom-help-mode prog-mode "Axiom Help"
   "Major mode for Axiom Help buffers."
   :group 'axiom
-  (setq font-lock-defaults (list axiom-help-font-lock-keywords)))
+  (setq font-lock-defaults (list axiom-help-font-lock-keywords))
+  (setq axiom-menu-compile-buffer-enable nil)
+  (setq axiom-menu-compile-file-enable nil)
+  (setq axiom-menu-read-buffer-enable nil)
+  (setq axiom-menu-read-file-enable nil)
+  (setq axiom-menu-read-region-enable t)
+  (setq axiom-menu-eval-region-enable t))
 
 (provide 'axiom-help-mode)
+
+;;; axiom-help-mode.el ends here

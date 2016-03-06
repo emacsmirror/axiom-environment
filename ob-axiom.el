@@ -1,23 +1,21 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; ob-axiom.el --- org-babel for the axiom-environment system -*- lexical-binding: t -*-
 
-;;; ob-axiom.el --- org-babel for the axiom-environment system
-
-;; Copyright (C) Paul Onions
+;; Copyright (C) 2014 - 2015 Paul Onions
 
 ;; Author: Paul Onions
+;; Keywords: Axiom, OpenAxiom, FriCAS
 
 ;; This file is free software, see the LICENCE file in this directory
 ;; for copying terms.
 
+;; Package-Requires: ((emacs "24.2") (axiom-environment "20150801"))
+
 ;;; Commentary:
 
-;; This file enables org-mode integration of the Axiom, OpenAxiom &
-;; FriCAS computer algebra systems, by way of the axiom-environment
-;; system.
-
-;;; Requirements:
-
-;; Requires axiom-environment to be installed.
+;; The ``ob-axiom'' package is an org-babel extension that integrates
+;; the axiom-environment into org-mode, allowing a literate
+;; development & presentation style with easy publishing to HTML, PDF,
+;; etc.
 
 ;;; Code:
 (require 'ob)
@@ -28,18 +26,29 @@
 (require 'axiom-environment)
 
 ;; Header arguments
+;;;###autoload
 (defconst org-babel-header-args:axiom '())
 
+;;;###autoload
 (defvar org-babel-default-header-args:axiom '((:session . "Axiom Org-Babel Session")))
 
 ;; File extension for Axiom Input files
+;;;###autoload
 (add-to-list 'org-babel-tangle-lang-exts '("axiom" . "input"))
 
+;;;###autoload
+(add-to-list 'org-babel-tangle-lang-exts '("spad" . "spad"))
+
 ;; Configure org editing options
+;;;###autoload
 (add-to-list 'org-src-lang-modes '("axiom" . axiom-input))
+
+;;;###autoload
+(add-to-list 'org-src-lang-modes '("spad" . axiom-spad))
 
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
+;;;###autoload
 (defun org-babel-axiom-initiate-session (session params)
   "Start an Axiom session for use by org-babel."
   (unless (string= session "none")
@@ -49,33 +58,32 @@
             session-name
           (axiom-process-start axiom-process-program))))))
 
-;; (defun org-babel-prep-session:axiom (session params)
-;;   "Prepare SESSION according to the header arguments specified in PARAMS.
-;; This function called by `org-babel-initiate-session'."
-;;   (org-babel-axiom-initiate-session session params))
+;;;###autoload
+(defun org-babel-axiom-var-to-axiom (val)
+  "Convert an elisp var into a string of Axiom source code
+specifying a var of the same value."
+  (if (listp val)
+      (concat "[" (mapconcat #'org-babel-axiom-var-to-axiom val ", ") "]")
+    (format "%S" val)))
 
-;; (defun org-babel-load-session:axiom (session body params)
-;;   "Load BODY into SESSION with PARAMS.
-;; This function called by `org-babel-load-in-session'."
-;;   (save-window-excursion
-;;     (let ((buffer (org-babel-prep-session:axiom session params)))
-;;       (with-current-buffer buffer
-;;         (goto-char (process-mark (get-buffer-process (current-buffer))))
-;;         (insert (org-babel-chomp body)))
-;;       buffer)))
-
+;;;###autoload
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables.
 This function called by `org-babel-expand-src-block'."
   (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
-    (mapcar (lambda (pair) (format "%S := %S\n" (car pair) (cdr pair))) vars)))
+    (mapcar
+     (lambda (pair)
+       (format "%S := %s" (car pair) (org-babel-axiom-var-to-axiom (cdr pair))))
+     vars)))
 
+;;;###autoload
 (defun org-babel-expand-body:axiom (body params)
   "Expand BODY with PARAMS."
   (mapconcat #'identity (append (org-babel-variable-assignments:axiom params)
                                 (list body))
              "\n"))
 
+;;;###autoload
 (defun org-babel-execute:axiom (body params)
   "Execute a block of Axiom code with org-babel.
 This function is called by `org-babel-execute-src-block'."
@@ -84,8 +92,9 @@ This function is called by `org-babel-execute-src-block'."
     (let ((axiom-process-buffer-name session))  ; dynamic binding
       (with-axiom-process-query-buffer
        (dolist (line lines)
-         (insert-before-markers line)
-         (axiom-process-redirect-send-command line (current-buffer) nil t t))
+         (beginning-of-line)
+         (unless (string-match "^[[:space:]]*$" line)
+           (axiom-process-redirect-send-command line (current-buffer) nil t t t t)))
        (buffer-substring (point-min) (point-max))))))
 
 ;;; Internal helper functions
@@ -100,3 +109,5 @@ This function is called by `org-babel-execute-src-block'."
     name))
 
 (provide 'ob-axiom)
+
+;;; ob-axiom.el ends here

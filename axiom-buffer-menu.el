@@ -1,8 +1,6 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; axiom-buffer-menu.el --- Display a list of Axiom buffers -*- lexical-binding: t -*-
 
-;;; axiom-buffer-menu.el -- to display a list of Axiom buffers
-
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -37,6 +35,9 @@
 (defface axiom-buffer-menu-group-heading '((t (:weight bold :foreground "maroon")))
   "Face used for displaying Axiom Buffer Menu group headings"
   :group 'axiom)
+
+(defvar axiom-buffer-menu-invoking-buffer nil
+  "Buffer from which ``axiom-buffer-menu'' was invoked.")
 
 (defvar axiom-buffer-menu-startpoint-input 0
   "Starting point of Input buffer list display.")
@@ -74,9 +75,7 @@
 
 (defun axiom-buffer-menu-quit ()
   (interactive)
-  (kill-this-buffer)
-  (when axiom-buffer-menu-invoking-buffer
-    (switch-to-buffer axiom-buffer-menu-invoking-buffer)))
+  (quit-window))
 
 (defun axiom-buffer-menu-get-bufname ()
   "Return name of buffer described by current line of buffer-menu."
@@ -134,8 +133,7 @@
   "Select the buffer whose line you click on."
   (interactive "e")
   (let (buffer)
-    (save-excursion
-      (set-buffer (window-buffer (posn-window (event-end event))))
+    (with-current-buffer (window-buffer (posn-window (event-end event)))
       (save-excursion
         (goto-char (posn-point (event-end event)))
         (setq buffer (axiom-buffer-menu-get-bufname))))
@@ -231,16 +229,14 @@
                (put-text-property heading-startpoint (point) 'face 'axiom-buffer-menu-group-heading)
                (setq axiom-buffer-menu-startpoint-help (point)))))
       (dolist (buffer (buffer-list))
-        (let (this-buffer-modified
-              this-buffer-read-only
+        (let (this-buffer-read-only
               this-buffer-name
               this-buffer-mode
               this-buffer-filename
               name-startpoint
               name-endpoint)
           (with-current-buffer buffer
-            (setq this-buffer-modified (buffer-modified-p buffer)
-                  this-buffer-read-only buffer-read-only
+            (setq this-buffer-read-only buffer-read-only
                   this-buffer-name (buffer-name)
                   this-buffer-mode major-mode
                   this-buffer-filename (buffer-file-name)))
@@ -270,8 +266,10 @@
               (princ (abbreviate-file-name this-buffer-filename)))
             (princ "\n"))))
       (princ "\n"))
+    (axiom-buffer-menu-mode)
     (goto-char axiom-buffer-menu-startpoint-cursor)))
 
+;;;###autoload
 (define-derived-mode axiom-buffer-menu-mode special-mode "Axiom Buffer Menu"
   "Major mode for giving users quick-access to Axiom buffers.
 \\<axiom-buffer-menu-mode-map>
@@ -289,12 +287,16 @@
   :group 'axiom
   (setq truncate-lines t))
 
+;;;###autoload
 (defun axiom-buffer-menu ()
   "Display a list of Axiom buffers."
   (interactive)
   (setq axiom-buffer-menu-invoking-buffer (current-buffer))
   (axiom-buffer-menu-prepare-buffer)
-  (switch-to-buffer axiom-buffer-menu-bufname)
-  (axiom-buffer-menu-mode))
+  (let ((popup (display-buffer axiom-buffer-menu-bufname '(display-buffer-same-window) t)))
+    (when (and popup axiom-select-popup-windows)
+      (select-window popup))))
 
 (provide 'axiom-buffer-menu)
+
+;;; axiom-buffer-menu.el ends here

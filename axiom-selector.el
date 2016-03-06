@@ -1,8 +1,6 @@
-;;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; axiom-selector.el --- A buffer selector utility for the Axiom environment -*- lexical-binding: t -*-
 
-;;; axiom-selector.el -- a buffer selector utility for the Axiom environment
-
-;; Copyright (C) 2013 - 2014 Paul Onions
+;; Copyright (C) 2013 - 2015 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -29,6 +27,7 @@
 Each element is a list (KEY DESCRIPTION FUNCTION), where
 DESCRIPTION is a one-line description of the command.")
 
+;;;###autoload
 (defun axiom-selector ()
   "Invoke a selector function by entering a single character.
 
@@ -73,7 +72,7 @@ is chosen."
     (dolist (entry axiom-selector-functions)
       (insert (format "%c:\t%s\n" (first entry) (second entry))))
     (help-mode)
-    (display-buffer (current-buffer) t)
+    (display-buffer (current-buffer) nil t)
     (shrink-window-if-larger-than-buffer 
      (get-buffer-window (current-buffer))))
   (axiom-selector)
@@ -115,3 +114,5 @@ is chosen."
   (axiom-buffer-menu))
 
 (provide 'axiom-selector)
+
+;;; axiom-selector.el ends here
