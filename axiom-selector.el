@@ -85,7 +85,10 @@ is chosen."
       (kill-buffer help-buffer))))
 
 (define-axiom-selector-function ?r "Switch to Axiom REPL buffer"
-  (switch-to-buffer axiom-process-buffer-name))
+  (let ((buf (get-buffer axiom-process-buffer-name)))
+    (if buf
+        (switch-to-buffer buf)
+      (message "Axiom REPL not available, try M-x run-axiom"))))
 
 (defun axiom-find-recent-buffer (mode)
   (let ((bufs (buffer-list (window-frame nil)))
