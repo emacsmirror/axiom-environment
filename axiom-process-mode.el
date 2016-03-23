@@ -1,6 +1,6 @@
 ;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2016 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -606,6 +606,58 @@ variable `axiom-process-webview-url'."
       (message "Source not found"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto-completion functions
+;;
+(defun axiom-process-list-subdirs (dir)
+  (with-current-buffer axiom-process-buffer-name
+    (let* ((absolute-dir (cond ((null dir)
+                                default-directory)
+                               ((not (file-name-absolute-p dir))
+                                (concat default-directory dir))
+                               (t
+                                dir)))
+           (files (directory-files absolute-dir dir))
+           (subdirs (remove-if-not (function file-directory-p) files))
+           (subdir-names (mapcar (function file-name-nondirectory) subdirs)))
+      (mapcar (lambda (subdir) (concat subdir "/")) subdir-names))))
+
+(defun axiom-process-complete-cd-command ()
+  (let ((partial-start nil)
+        (partial-end nil)
+        (line-end nil))
+    (with-current-buffer axiom-process-buffer-name
+      (save-excursion
+        (setq partial-end (point))
+        (end-of-line)
+        (setq line-end (point))
+        (beginning-of-line)
+        (setq partial-start (search-forward-regexp ")cd[[:blank:]]+" line-end t))
+        (when partial-start
+          (when (> partial-start partial-end)
+            (setq partial-start partial-end))
+          (let* ((partial (buffer-substring-no-properties partial-start partial-end))
+                 (dir-path (file-name-directory partial))
+                 (file-prefix (file-name-nondirectory partial))
+                 (partial-split (- partial-end (length file-prefix))))
+            (list partial-split
+                  partial-end
+                  (axiom-process-list-subdirs dir-path))))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Indenting functions
+;;
+(defun axiom-process-is-command-line ()
+  (with-current-buffer axiom-process-buffer-name
+    (save-excursion     
+      (beginning-of-line)
+      (eql (char-after) ?\)))))
+
+(defun axiom-process-indent-line-fn ()
+  (if (axiom-process-is-command-line)
+      (complete-symbol nil)
+    (indent-relative)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Axiom process mode -- derived from COMINT mode
 ;;
 (defvar axiom-process-package-face  'axiom-package-name)
@@ -628,6 +680,9 @@ variable `axiom-process-webview-url'."
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
   (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
+  (setq indent-line-function 'axiom-process-indent-line-fn)
+  (setq electric-indent-inhibit t)
+  (add-to-list 'completion-at-point-functions 'axiom-process-complete-cd-command)
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable t)
   (setq axiom-menu-read-buffer-enable nil)
