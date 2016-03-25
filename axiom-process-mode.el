@@ -608,7 +608,7 @@ variable `axiom-process-webview-url'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-completion functions
 ;;
-(defun axiom-process-list-subdirs (dir)
+(defun axiom-process-list-filenames (dir &optional filter)
   (with-current-buffer axiom-process-buffer-name
     (let* ((absolute-dir (cond ((null dir)
                                 default-directory)
@@ -616,12 +616,21 @@ variable `axiom-process-webview-url'."
                                 (concat default-directory dir))
                                (t
                                 dir)))
-           (files (directory-files absolute-dir dir))
-           (subdirs (remove-if-not (function file-directory-p) files))
-           (subdir-names (mapcar (function file-name-nondirectory) subdirs)))
-      (mapcar (lambda (subdir) (concat subdir "/")) subdir-names))))
+           (dir-files (directory-files absolute-dir dir))
+           (subdirs nil)
+           (subfiles nil))
+      (dolist (file dir-files)
+        (if (file-directory-p file)
+            (push (file-name-as-directory (file-name-nondirectory file)) subdirs)
+          (push (file-name-nondirectory file) subfiles)))
+      (cond ((eql filter :dirs)
+             subdirs)
+            ((eql filter :files)
+             subfiles)
+            (t
+             (append subdirs subfiles))))))
 
-(defun axiom-process-complete-cd-command ()
+(defun axiom-process-complete-command-filename (&optional filter)
   (let ((partial-start nil)
         (partial-end nil)
         (line-end nil))
@@ -631,7 +640,7 @@ variable `axiom-process-webview-url'."
         (end-of-line)
         (setq line-end (point))
         (beginning-of-line)
-        (setq partial-start (search-forward-regexp ")cd[[:blank:]]+" line-end t))
+        (setq partial-start (search-forward-regexp ")[[:word:]]+[[:blank:]]+" line-end t))
         (when partial-start
           (when (> partial-start partial-end)
             (setq partial-start partial-end))
@@ -641,7 +650,22 @@ variable `axiom-process-webview-url'."
                  (partial-split (- partial-end (length file-prefix))))
             (list partial-split
                   partial-end
-                  (axiom-process-list-subdirs dir-path))))))))
+                  (axiom-process-list-filenames dir-path filter))))))))
+
+(defun axiom-process-complete-command-line ()
+  (let ((filter nil))
+    (with-current-buffer axiom-process-buffer-name
+      (save-excursion
+        (beginning-of-line)
+        (setq filter (cond ((looking-at "[[:blank:]]*)cd[[:blank:]]+")
+                            :dirs)
+                           ((looking-at "[[:blank:]]*)read[[:blank:]]+")
+                            :all)
+                           ((looking-at "[[:blank:]]*)compile[[:blank:]]+")
+                            :all)
+                           ((looking-at "[[:blank:]]*)library[[:blank:]]+")
+                            :all)))))
+    (and filter (axiom-process-complete-command-filename filter))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Indenting functions
@@ -650,7 +674,7 @@ variable `axiom-process-webview-url'."
   (with-current-buffer axiom-process-buffer-name
     (save-excursion     
       (beginning-of-line)
-      (eql (char-after) ?\)))))
+      (looking-at "[[:blank:]]*)[[:word:]]+[[:blank:]]+"))))
 
 (defun axiom-process-indent-line-fn ()
   (if (axiom-process-is-command-line)
@@ -682,7 +706,7 @@ variable `axiom-process-webview-url'."
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
   (setq indent-line-function 'axiom-process-indent-line-fn)
   (setq electric-indent-inhibit t)
-  (add-to-list 'completion-at-point-functions 'axiom-process-complete-cd-command)
+  (add-to-list 'completion-at-point-functions 'axiom-process-complete-command-line)
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable t)
   (setq axiom-menu-read-buffer-enable nil)
