@@ -1,6 +1,6 @@
 ;;; axiom-spad-mode.el --- Major mode for the Axiom library language -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2016 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -16,6 +16,8 @@
 ;;; Code:
 
 (require 'axiom-base)
+(require 'axiom-help-mode)
+(require 'axiom-process-mode)
 
 (defface axiom-spad-doc-comment '((t (:foreground "dark magenta")))
   "Face used for displaying SPAD documentation comments."
@@ -67,11 +69,25 @@
 (defvar axiom-spad-mode-hook nil
   "Hook for customizing Axiom SPAD mode.")
 
+(defun axiom-spad-complete-symbol ()
+  (and (looking-back "[[:word:]]+" nil t)
+       (list (match-beginning 0)
+             (match-end 0)
+             axiom-standard-names-and-abbreviations)))
+
+(defun axiom-spad-indent-line ()
+  (if (eql (char-syntax (char-before)) ?w)
+      (complete-symbol nil)
+    (indent-relative)))
+
 ;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"
   "Major mode for Axiom's SPAD language."
   :group 'axiom
   (setq font-lock-defaults (list axiom-spad-font-lock-keywords))
+  (setq indent-line-function 'axiom-spad-indent-line)
+  (setq electric-indent-inhibit t)
+  (setq completion-at-point-functions '(axiom-spad-complete-symbol))
   (setq axiom-menu-compile-buffer-enable t)
   (setq axiom-menu-compile-file-enable t)
   (setq axiom-menu-read-buffer-enable nil)

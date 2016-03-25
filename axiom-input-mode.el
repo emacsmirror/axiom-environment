@@ -1,6 +1,6 @@
 ;;; axiom-input-mode.el --- Major mode for the Axiom interactive language -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2016 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -15,6 +15,8 @@
 ;;; Code:
 
 (require 'axiom-base)
+(require 'axiom-help-mode)
+(require 'axiom-process-mode)
 
 (defface axiom-input-doc-comment '((t (:foreground "dark magenta")))
   "Face used for displaying input documentation comments."
@@ -79,11 +81,25 @@
     (axiom-process-eval-string str)
     (axiom-move-to-next-line)))
 
+(defun axiom-input-complete-symbol ()
+  (and (looking-back "[[:word:]]+" nil t)
+       (list (match-beginning 0)
+             (match-end 0)
+             axiom-standard-names-and-abbreviations)))
+
+(defun axiom-input-indent-line ()
+  (if (eql (char-syntax (char-before)) ?w)
+      (complete-symbol nil)
+    (indent-relative)))
+
 ;;;###autoload
 (define-derived-mode axiom-input-mode prog-mode "Axiom Input"
   "Major mode for the Axiom-Input interactive language."
   :group 'axiom
   (setq font-lock-defaults (list 'axiom-input-font-lock-keywords))
+  (setq indent-line-function 'axiom-input-indent-line)
+  (setq electric-indent-inhibit t)
+  (setq completion-at-point-functions '(axiom-input-complete-symbol))
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable nil)
   (setq axiom-menu-read-buffer-enable t)
