@@ -171,7 +171,8 @@ prompt in output to OUTPUT-BUFFER."
         (insert-before-markers command "\n"))
       (comint-redirect-send-command command output-buffer echo-result (not display))
       (while (not comint-redirect-completed)
-        (accept-process-output proc))
+        (accept-process-output proc)
+        (redisplay))
       (when (and echo-cmd (not echo-result))  ; get prompt back
         (axiom-process-insert-command "")))))
 
@@ -312,19 +313,19 @@ buffer, otherwise do not display it."
                             (file-name-as-directory (expand-file-name axiom-process-compile-file-result-directory))
                           (file-name-directory (expand-file-name filename)))))
         (with-current-buffer (get-buffer-create axiom-process-compile-file-buffer-name)
-          (unless no-display
-            (display-buffer axiom-process-compile-file-buffer-name nil t))
           (setq buffer-read-only nil)
           (erase-buffer)
           (axiom-help-mode)
+          (unless no-display
+            (display-buffer axiom-process-compile-file-buffer-name nil t)
+            (redisplay t))
           (axiom-process-redirect-send-command (format ")cd %s" result-dir) (current-buffer) (not no-display))
           (axiom-process-redirect-send-command (format ")compile %s" (expand-file-name filename)) (current-buffer) (not no-display))
           (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))
           (set-buffer-modified-p nil)
           (setq buffer-read-only t))))
       (when (and axiom-select-popup-windows (not no-display))
-        (select-window (display-buffer axiom-process-compile-file-buffer-name nil t))
-        (goto-char (point-max)))))
+        (select-window (display-buffer axiom-process-compile-file-buffer-name nil t)))))
 
 ;;;###autoload
 (defun axiom-process-compile-buffer (&optional no-display)
