@@ -15,6 +15,7 @@
 ;;; Code:
 
 (require 'axiom-base)
+(require 'axiom-help-mode)
 (require 'comint)
 
 (defcustom axiom-process-buffer-name "*Axiom REPL*"
@@ -634,37 +635,35 @@ variable `axiom-process-webview-url'."
   (let ((partial-start nil)
         (partial-end nil)
         (line-end nil))
-    (with-current-buffer axiom-process-buffer-name
-      (save-excursion
-        (setq partial-end (point))
-        (end-of-line)
-        (setq line-end (point))
-        (beginning-of-line)
-        (setq partial-start (search-forward-regexp ")[[:word:]]+[[:blank:]]+" line-end t))
-        (when partial-start
-          (when (> partial-start partial-end)
-            (setq partial-start partial-end))
-          (let* ((partial (buffer-substring-no-properties partial-start partial-end))
-                 (dir-path (file-name-directory partial))
-                 (file-prefix (file-name-nondirectory partial))
-                 (partial-split (- partial-end (length file-prefix))))
-            (list partial-split
-                  partial-end
-                  (axiom-process-list-filenames dir-path filter))))))))
+    (save-excursion
+      (setq partial-end (point))
+      (end-of-line)
+      (setq line-end (point))
+      (beginning-of-line)
+      (setq partial-start (search-forward-regexp ")[[:word:]]+[[:blank:]]+" line-end t))
+      (when partial-start
+        (when (> partial-start partial-end)
+          (setq partial-start partial-end))
+        (let* ((partial (buffer-substring-no-properties partial-start partial-end))
+               (dir-path (file-name-directory partial))
+               (file-prefix (file-name-nondirectory partial))
+               (partial-split (- partial-end (length file-prefix))))
+          (list partial-split
+                partial-end
+                (axiom-process-list-filenames dir-path filter)))))))
 
 (defun axiom-process-complete-command-line ()
   (let ((filter nil))
-    (with-current-buffer axiom-process-buffer-name
-      (save-excursion
-        (beginning-of-line)
-        (setq filter (cond ((looking-at "[[:blank:]]*)cd[[:blank:]]+")
-                            :dirs)
-                           ((looking-at "[[:blank:]]*)read[[:blank:]]+")
-                            :all)
-                           ((looking-at "[[:blank:]]*)compile[[:blank:]]+")
-                            :all)
-                           ((looking-at "[[:blank:]]*)library[[:blank:]]+")
-                            :all)))))
+    (save-excursion
+      (beginning-of-line)
+      (setq filter (cond ((looking-at "[[:blank:]]*)cd[[:blank:]]+")
+                          :dirs)
+                         ((looking-at "[[:blank:]]*)read[[:blank:]]+")
+                          :all)
+                         ((looking-at "[[:blank:]]*)compile[[:blank:]]+")
+                          :all)
+                         ((looking-at "[[:blank:]]*)library[[:blank:]]+")
+                          :all))))
     (and filter (axiom-process-complete-command-filename filter))))
 
 (defun axiom-process-complete-symbol ()
@@ -677,12 +676,11 @@ variable `axiom-process-webview-url'."
 ;; Indenting functions
 ;;
 (defun axiom-process-is-command-line ()
-  (with-current-buffer axiom-process-buffer-name
-    (save-excursion     
-      (beginning-of-line)
-      (looking-at "[[:blank:]]*)[[:word:]]+[[:blank:]]+"))))
+  (save-excursion     
+    (beginning-of-line)
+    (looking-at "[[:blank:]]*)[[:word:]]+[[:blank:]]+")))
 
-(defun axiom-process-indent-line-fn ()
+(defun axiom-process-indent-line ()
   (if (or (axiom-process-is-command-line)
           (eql (char-syntax (char-before)) ?w))
       (complete-symbol nil)
@@ -711,7 +709,7 @@ variable `axiom-process-webview-url'."
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
   (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
-  (setq indent-line-function 'axiom-process-indent-line-fn)
+  (setq indent-line-function 'axiom-process-indent-line)
   (setq electric-indent-inhibit t)
   (setq completion-at-point-functions '(axiom-process-complete-command-line
                                         axiom-process-complete-symbol))
