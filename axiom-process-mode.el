@@ -667,6 +667,12 @@ variable `axiom-process-webview-url'."
                             :all)))))
     (and filter (axiom-process-complete-command-filename filter))))
 
+(defun axiom-process-complete-symbol ()
+  (and (looking-back "[[:word:]]+" nil t)
+       (list (match-beginning 0)
+             (match-end 0)
+             axiom-standard-names-and-abbreviations)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Indenting functions
 ;;
@@ -677,7 +683,8 @@ variable `axiom-process-webview-url'."
       (looking-at "[[:blank:]]*)[[:word:]]+[[:blank:]]+"))))
 
 (defun axiom-process-indent-line-fn ()
-  (if (axiom-process-is-command-line)
+  (if (or (axiom-process-is-command-line)
+          (eql (char-syntax (char-before)) ?w))
       (complete-symbol nil)
     (indent-relative)))
 
@@ -706,7 +713,8 @@ variable `axiom-process-webview-url'."
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
   (setq indent-line-function 'axiom-process-indent-line-fn)
   (setq electric-indent-inhibit t)
-  (add-to-list 'completion-at-point-functions 'axiom-process-complete-command-line)
+  (setq completion-at-point-functions '(axiom-process-complete-command-line
+                                        axiom-process-complete-symbol))
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable t)
   (setq axiom-menu-read-buffer-enable nil)
