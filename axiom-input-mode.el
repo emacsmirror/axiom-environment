@@ -18,11 +18,11 @@
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
 
-(defface axiom-input-doc-comment '((t (:foreground "dark magenta")))
+(defface axiom-input-doc-comment '((t :inherit font-lock-doc-face))
   "Face used for displaying input documentation comments."
   :group 'axiom)
 
-(defface axiom-input-keyword '((t (:foreground "grey25")))
+(defface axiom-input-keyword '((t :inherit font-lock-keyword-face))
   "Face used for displaying input file keywords."
   :group 'axiom)
 

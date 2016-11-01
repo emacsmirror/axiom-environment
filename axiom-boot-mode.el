@@ -19,7 +19,7 @@
 
 (require 'axiom-base)
 
-(defface axiom-boot-keyword '((t (:foreground "DarkBlue")))
+(defface axiom-boot-keyword '((t :inherit font-lock-keyword-face))
   "Face used for displaying Boot keywords."
   :group 'axiom)
 

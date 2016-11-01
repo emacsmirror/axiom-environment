@@ -32,7 +32,7 @@
   :type 'integer
   :group 'axiom)
 
-(defface axiom-buffer-menu-group-heading '((t (:weight bold :foreground "maroon")))
+(defface axiom-buffer-menu-group-heading '((t :weight bold))
   "Face used for displaying Axiom Buffer Menu group headings"
   :group 'axiom)
 
