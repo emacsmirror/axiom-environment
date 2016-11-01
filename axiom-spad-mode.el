@@ -19,11 +19,11 @@
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
 
-(defface axiom-spad-doc-comment '((t (:foreground "dark magenta")))
+(defface axiom-spad-doc-comment '((t :inherit font-lock-doc-face))
   "Face used for displaying SPAD documentation comments."
   :group 'axiom)
 
-(defface axiom-spad-keyword '((t (:foreground "grey25")))
+(defface axiom-spad-keyword '((t :inherit font-lock-keyword-face))
   "Face used for displaying SPAD keywords."
   :group 'axiom)
 
@@ -36,7 +36,7 @@
   "A SPAD documentation comment.")
 
 (defvar axiom-spad-keyword-names
-  (list "add" "with" "has"
+  (list "add" "with" "has" "is"
         "if" "then" "else"
         "for" "in" "by" "while" "repeat" "return" "break"))
 

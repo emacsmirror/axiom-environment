@@ -46,19 +46,19 @@
   :type 'string
   :group 'axiom)
 
-(defface axiom-package-name '((t (:foreground "blue")))
+(defface axiom-package-name '((t :inherit font-lock-constant-face))
   "Face used for displaying package names."
   :group 'axiom)
 
-(defface axiom-domain-name '((t (:foreground "darkgreen")))
+(defface axiom-domain-name '((t :inherit font-lock-builtin-face))
   "Face used for displaying domain names."
   :group 'axiom)
 
-(defface axiom-category-name '((t (:foreground "brown")))
+(defface axiom-category-name '((t :inherit font-lock-type-face))
   "Face used for displaying category names."
   :group 'axiom)
 
-(defface axiom-operation-name '((t (:foreground "black")))
+(defface axiom-operation-name '((t :inherit font-lock-function-name-face))
   "Face used for displaying operation names."
   :group 'axiom)
 
