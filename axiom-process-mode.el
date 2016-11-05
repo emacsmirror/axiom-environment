@@ -426,6 +426,22 @@ buffer, otherwise do not display it."
                   (t
                    name-or-abbrev)))))
 
+(defun axiom-process-document-constructor (name-or-abbrev &optional force-update)
+  "Construct a buffer containing documentation for NAME-OR-ABBREV."
+  (if (not (get-buffer axiom-process-buffer-name))
+      (message axiom-process-not-running-message)
+    (unless (equal "" name-or-abbrev)
+      (let ((bufname (axiom-process-constructor-buffer-name name-or-abbrev)))
+        (when (or (not (get-buffer bufname)) force-update)
+          (with-current-buffer (get-buffer-create bufname)
+            (setq buffer-read-only nil)
+            (erase-buffer)
+            (axiom-help-mode)
+            (axiom-process-redirect-send-command (format ")show %s" name-or-abbrev) (current-buffer) t nil nil)
+            (set-buffer-modified-p nil)
+            (setq buffer-read-only t)))
+        (get-buffer bufname)))))
+
 ;;;###autoload
 (defun axiom-process-show-constructor (name-or-abbrev &optional force-update)
   "Show information about NAME-OR-ABBREV in a popup buffer.
@@ -446,21 +462,10 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                       nil 'confirm
                       (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
-  (if (not (get-buffer axiom-process-buffer-name))
-      (message axiom-process-not-running-message)
-    (unless (equal "" name-or-abbrev)
-      (let ((bufname (axiom-process-constructor-buffer-name name-or-abbrev)))
-        (when (or (not (get-buffer bufname)) force-update)
-          (with-current-buffer (get-buffer-create bufname)
-            (setq buffer-read-only nil)
-            (erase-buffer)
-            (axiom-help-mode)
-            (axiom-process-redirect-send-command (format ")show %s" name-or-abbrev) (current-buffer) t nil nil)
-            (set-buffer-modified-p nil)
-            (setq buffer-read-only t)))
-        (let ((popup (display-buffer bufname nil t)))
-          (when (and popup axiom-select-popup-windows)
-            (select-window popup)))))))
+  (let* ((buf (axiom-process-document-constructor name-or-abbrev force-update))
+         (popup (display-buffer buf nil t)))
+    (when (and popup axiom-select-popup-windows)
+      (select-window popup))))
 
 ;;;###autoload
 (defun axiom-process-show-package (name-or-abbrev &optional force-update)
@@ -519,6 +524,22 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                      current-prefix-arg))
   (axiom-process-show-constructor name-or-abbrev force-update))
 
+(defun axiom-process-document-operation (operation-name &optional force-update)
+  "Create a buffer containing documentation for OPERATION-NAME."
+  (if (not (get-buffer axiom-process-buffer-name))
+      (message axiom-process-not-running-message)
+    (unless (equal "" operation-name)
+      (let ((bufname (format "*Axiom Operation: %s*" operation-name)))
+        (when (or (not (get-buffer bufname)) force-update)
+          (with-current-buffer (get-buffer-create bufname)
+            (setq buffer-read-only nil)
+            (erase-buffer)
+            (axiom-help-mode)
+            (axiom-process-redirect-send-command (format ")display operation %s" operation-name) (current-buffer) t nil nil)
+            (set-buffer-modified-p nil)
+            (setq buffer-read-only t)))
+        (get-buffer bufname)))))
+
 ;;;###autoload
 (defun axiom-process-display-operation (operation-name &optional force-update)
   "Show information about OPERATION-NAME in a popup buffer.
@@ -536,21 +557,10 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                       "Operation: " axiom-standard-operation-names nil 'confirm
                       (axiom-process-verify-operation-name (thing-at-point 'word)))
                      current-prefix-arg))
-  (if (not (get-buffer axiom-process-buffer-name))
-      (message axiom-process-not-running-message)
-    (unless (equal "" operation-name)
-      (let ((bufname (format "*Axiom Operation: %s*" operation-name)))
-        (when (or (not (get-buffer bufname)) force-update)
-          (with-current-buffer (get-buffer-create bufname)
-            (setq buffer-read-only nil)
-            (erase-buffer)
-            (axiom-help-mode)
-            (axiom-process-redirect-send-command (format ")display operation %s" operation-name) (current-buffer) t nil nil)
-            (set-buffer-modified-p nil)
-            (setq buffer-read-only t)))
-        (let ((popup (display-buffer bufname nil t)))
-          (when (and popup axiom-select-popup-windows)
-            (select-window popup)))))))
+  (let* ((buf (axiom-process-document-operation operation-name force-update))
+         (popup (display-buffer buf nil t)))
+    (when (and popup axiom-select-popup-windows)
+      (select-window popup))))
 
 ;;;###autoload
 (defun axiom-process-apropos-thing-at-point (name &optional is-constructor)
