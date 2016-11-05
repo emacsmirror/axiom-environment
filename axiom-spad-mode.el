@@ -76,6 +76,7 @@
              axiom-standard-names-and-abbreviations)))
 
 (defun axiom-spad-interactive-complete ()
+  (interactive)
   (if (and (boundp 'company-mode) company-mode)
       (company-complete)
     (complete-symbol nil)))

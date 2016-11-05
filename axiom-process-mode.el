@@ -691,11 +691,17 @@ variable `axiom-process-webview-url'."
     (beginning-of-line)
     (looking-at "[[:blank:]]*)[[:word:]]+[[:blank:]]+")))
 
+(defun axiom-process-interactive-complete ()
+  (interactive)
+  (if (and (boundp 'company-mode) company-mode)
+      (company-complete)
+    (complete-symbol nil)))
+
 (defun axiom-process-indent-line ()
   (if (or (axiom-process-is-command-line)
           (eql (char-syntax (char-before)) ?w))
-      (complete-symbol nil)
-    (indent-relative)))
+      (axiom-process-interactive-complete)
+    (indent-relative-maybe)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Axiom process mode -- derived from COMINT mode
