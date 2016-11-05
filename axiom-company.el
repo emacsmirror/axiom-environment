@@ -39,9 +39,12 @@
        (:domain   " [D]")
        (:category " [C]")))
     (doc-buffer
-     (if (axiom-process-verify-operation-name arg)
-         (axiom-process-document-operation arg)
-       (axiom-process-document-constructor arg)))
+     (cond ((not (get-buffer axiom-process-buffer-name))
+            nil)
+           ((axiom-process-verify-operation-name arg)
+            (axiom-process-document-operation arg))
+           ((axiom-process-verify-constructor-name-or-abbrev arg)
+            (axiom-process-document-constructor arg))))
     (location
      (when (axiom-process-verify-constructor-name-or-abbrev arg)
        (let ((src-info (axiom-process-find-constructor-source arg)))
