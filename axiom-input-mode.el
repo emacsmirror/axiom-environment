@@ -87,10 +87,15 @@
              (match-end 0)
              axiom-standard-names-and-abbreviations)))
 
+(defun axiom-input-interactive-complete ()
+  (if (and (boundp 'company-mode) company-mode)
+      (company-complete)
+    (complete-symbol nil)))
+
 (defun axiom-input-indent-line ()
   (if (eql (char-syntax (char-before)) ?w)
-      (complete-symbol nil)
-    (indent-relative)))
+      (axiom-input-interactive-complete)
+    (indent-relative-maybe)))
 
 ;;;###autoload
 (define-derived-mode axiom-input-mode prog-mode "Axiom Input"

@@ -75,10 +75,15 @@
              (match-end 0)
              axiom-standard-names-and-abbreviations)))
 
+(defun axiom-spad-interactive-complete ()
+  (if (and (boundp 'company-mode) company-mode)
+      (company-complete)
+    (complete-symbol nil)))
+
 (defun axiom-spad-indent-line ()
   (if (eql (char-syntax (char-before)) ?w)
-      (complete-symbol nil)
-    (indent-relative)))
+      (axiom-spad-interactive-complete)
+    (indent-relative-maybe)))
 
 ;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"
