@@ -87,6 +87,10 @@ file."
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
 
+(defvar axiom-process-mode-syntax-table
+  (copy-syntax-table axiom-common-syntax-table)
+  "The Axiom process mode syntax table.")
+
 (defvar axiom-process-mode-map
   (let ((map (copy-keymap axiom-common-keymap)))
     (set-keymap-parent map comint-mode-map)
