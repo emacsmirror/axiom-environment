@@ -1,6 +1,6 @@
 ;;; axiom-environment.el --- An environment for using Axiom/OpenAxiom/FriCAS -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2016 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -49,6 +49,10 @@
 (require 'axiom-boot-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
+
+;; Load company-mode backend only if company-mode available
+(when (require 'company nil t)
+  (require 'axiom-company))
 
 ;; Automatically put .input, .spad and .boot files into the correct major mode.
 ;;;###autoload

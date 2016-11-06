@@ -125,7 +125,7 @@
   (interactive)
   (let ((selected-buffer (axiom-buffer-menu-get-bufname)))
     (cond (selected-buffer
-           (display-buffer selected-buffer))
+           (display-buffer selected-buffer '(display-buffer-reuse-window (inhibit-same-window . t))))
           (t
            (message "No buffer on this line")))))
 
