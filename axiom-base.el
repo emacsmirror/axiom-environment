@@ -255,6 +255,64 @@ string (either relative or absolute)."
   "The Axiom environment common syntax table.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Common indentation routines
+;;
+(defun axiom-find-previous-indent (&optional bound)
+  "Find the indentation level of the previous non-blank line.
+
+If BOUND is non-nil then find the indentation level of the most
+recent line whose indentation level is strictly less then BOUND."
+  (save-excursion
+    (beginning-of-line)
+    (let ((bound-satisfied nil)
+          (indent 0))
+      (while (not bound-satisfied)
+        (setq indent (if (re-search-backward "^\\([[:blank:]]*\\)[[:graph:]]" nil t)
+                         (- (match-end 1) (match-beginning 1))
+                       0))
+        (when (or (not bound) (< indent bound))
+          (setq bound-satisfied t)))
+      indent)))
+
+(defun axiom-compute-indent-increment (regexp step)
+  "Compute the required increase in indentation level.
+
+If the previous non-blank line matches REGEXP then return STEP,
+otherwise return 0."
+  (save-excursion
+    (beginning-of-line)
+    (let ((limit (point)))
+      (re-search-backward "[[:graph:]]")
+      (beginning-of-line)
+      (if (re-search-forward regexp limit t)
+          step
+        0))))
+
+(defun axiom-in-indent-space ()
+  "Determine if point is inside the current line's indentation space."
+  (let ((match nil)
+        (eol nil))
+    (save-excursion
+      (end-of-line)
+      (let ((eol (point)))
+        (beginning-of-line)
+        (setq match (re-search-forward "[[:blank:]]*\\([[:graph:]]\\|$\\)" eol))))
+    (and match (< (point) (match-beginning 1)))))
+
+(defun axiom-set-current-indent (amount)
+  "Set the indentation level of the current line to AMOUNT.
+
+If point is within the indentation space then move it to the end
+of the space, to the specified indentation level."
+  (save-excursion
+    (beginning-of-line)
+    (if (re-search-forward "^\\([[:blank:]]*\\)" nil t)
+        (replace-match (make-string amount ?\ ))))
+  (let ((left-of-indent (- amount (current-column))))
+    (when (> left-of-indent 0)
+      (forward-char left-of-indent))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common keymap (including the ``Axiom'' menu)
 ;;
 (defvar axiom-menu-compile-buffer-enable nil)
