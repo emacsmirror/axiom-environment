@@ -87,7 +87,7 @@
     (complete-symbol nil)))
 
 (defvar axiom-spad-indentation-increase-regexp
-  "\\(^[[:blank:]]*if\\|else$\\|repeat$\\|==$\\)"
+  "\\(^[[:blank:]]*if\\|else$\\|repeat$\\|==$\\|:$\\|with\\|add\\)"
   "Increase next line's indentation level if matched.")
 
 (defun axiom-spad-indent-line ()
