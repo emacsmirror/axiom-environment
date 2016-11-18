@@ -51,7 +51,6 @@
        (let ((src-info (axiom-process-find-constructor-source arg)))
          (cons (first src-info) (second src-info)))))))
 
-;;;###autoload
 (add-to-list 'company-backends 'axiom-company-backend)
 
 ;; Augment standard company-mode key bindings
