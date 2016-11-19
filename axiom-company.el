@@ -21,7 +21,6 @@
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
 
-;;;###autoload
 (defun axiom-company-backend (command &optional arg &rest ignored)
   (interactive (list 'interactive))
   (cl-case command
