@@ -355,10 +355,22 @@ buffer, otherwise do not display it."
         (cdr rslt)
       name-or-abbrev)))
 
+(defun axiom-process-package-abbrev (name-or-abbrev)
+  (let ((rslt (rassoc name-or-abbrev axiom-standard-package-info)))
+    (if rslt
+        (car rslt)
+      name-or-abbrev)))
+
 (defun axiom-process-domain-name (name-or-abbrev)
   (let ((rslt (assoc name-or-abbrev axiom-standard-domain-info)))
     (if rslt
         (cdr rslt)
+      name-or-abbrev)))
+
+(defun axiom-process-domain-abbrev (name-or-abbrev)
+  (let ((rslt (rassoc name-or-abbrev axiom-standard-domain-info)))
+    (if rslt
+        (car rslt)
       name-or-abbrev)))
 
 (defun axiom-process-category-name (name-or-abbrev)
@@ -367,12 +379,26 @@ buffer, otherwise do not display it."
         (cdr rslt)
       name-or-abbrev)))
 
+(defun axiom-process-category-abbrev (name-or-abbrev)
+  (let ((rslt (rassoc name-or-abbrev axiom-standard-category-info)))
+    (if rslt
+        (car rslt)
+      name-or-abbrev)))
+
 (defun axiom-process-constructor-name (name-or-abbrev)
   (let ((rslt (or (assoc name-or-abbrev axiom-standard-package-info)
                   (assoc name-or-abbrev axiom-standard-domain-info)
                   (assoc name-or-abbrev axiom-standard-category-info))))
     (if rslt
         (cdr rslt)
+      name-or-abbrev)))
+
+(defun axiom-process-constructor-abbrev (name-or-abbrev)
+  (let ((rslt (or (rassoc name-or-abbrev axiom-standard-package-info)
+                  (rassoc name-or-abbrev axiom-standard-domain-info)
+                  (rassoc name-or-abbrev axiom-standard-category-info))))
+    (if rslt
+        (car rslt)
       name-or-abbrev)))
 
 (defun axiom-process-verify-package-name-or-abbrev (name-or-abbrev)
@@ -430,6 +456,50 @@ buffer, otherwise do not display it."
                   (t
                    name-or-abbrev)))))
 
+(defun axiom-process-display-thing ()
+  (interactive)
+  (let ((name (thing-at-point 'word)))
+    (if (not (get-buffer axiom-process-buffer-name))
+        (message axiom-process-not-running-message)
+      (unless (equal "" name)
+        (cond ((member name axiom-standard-constructor-names-and-abbreviations)
+               (axiom-process-show-constructor name))
+              (t
+               (axiom-process-display-operation name)))))))
+
+(defvar axiom-process-clickable-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'axiom-process-display-thing)
+    (define-key map [mouse-2] 'axiom-process-display-thing)
+    map)
+  "Keymap for clickable items in an Axiom Help mode buffer.")
+
+(defun axiom-process-make-clickable (begin end tooltip-text)
+  (add-text-properties begin end
+                       (list 'mouse-face 'highlight
+                             'help-echo tooltip-text
+                             'keymap axiom-process-clickable-map
+                             'follow-link 'mouse-face)))
+
+(defun axiom-process-make-all-clickables ()
+  (save-excursion
+    (beginning-of-buffer)
+    (while (re-search-forward "[[:word:]]+" nil t)
+      (let* ((word (match-string-no-properties 0))
+             (info (cond ((member word axiom-standard-package-names-and-abbreviations)
+                          (cons t (concat (axiom-process-package-abbrev word) " = "
+                                          (axiom-process-package-name word) " [P]")))
+                         ((member word axiom-standard-domain-names-and-abbreviations)
+                          (cons t (concat (axiom-process-domain-abbrev word) " = "
+                                          (axiom-process-domain-name word) " [D]")))
+                         ((member word axiom-standard-category-names-and-abbreviations)
+                          (cons t (concat (axiom-process-category-abbrev word) " = "
+                                          (axiom-process-category-name word) " [C]")))
+                         ((member word axiom-standard-operation-names)
+                          (cons t nil)))))
+        (when (car info)
+          (axiom-process-make-clickable (match-beginning 0) (match-end 0) (cdr info)))))))
+
 (defun axiom-process-document-constructor (name-or-abbrev &optional force-update)
   "Construct a buffer containing documentation for NAME-OR-ABBREV."
   (if (not (get-buffer axiom-process-buffer-name))
@@ -442,6 +512,7 @@ buffer, otherwise do not display it."
             (erase-buffer)
             (axiom-help-mode)
             (axiom-process-redirect-send-command (format ")show %s" name-or-abbrev) (current-buffer) t nil nil)
+            (axiom-process-make-all-clickables)
             (set-buffer-modified-p nil)
             (setq buffer-read-only t)))
         (get-buffer bufname)))))
@@ -540,6 +611,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
             (erase-buffer)
             (axiom-help-mode)
             (axiom-process-redirect-send-command (format ")display operation %s" operation-name) (current-buffer) t nil nil)
+            (axiom-process-make-all-clickables)
             (set-buffer-modified-p nil)
             (setq buffer-read-only t)))
         (get-buffer bufname)))))

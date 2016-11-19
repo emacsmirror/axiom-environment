@@ -21,7 +21,6 @@
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
 
-;;;###autoload
 (defun axiom-company-backend (command &optional arg &rest ignored)
   (interactive (list 'interactive))
   (cl-case command
@@ -51,7 +50,6 @@
        (let ((src-info (axiom-process-find-constructor-source arg)))
          (cons (first src-info) (second src-info)))))))
 
-;;;###autoload
 (add-to-list 'company-backends 'axiom-company-backend)
 
 ;; Augment standard company-mode key bindings

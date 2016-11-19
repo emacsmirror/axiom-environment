@@ -27,6 +27,11 @@
   "Face used for displaying SPAD keywords."
   :group 'axiom)
 
+(defcustom axiom-spad-indentation-step 2
+  "Indentation step to use in Axiom SPAD mode buffers."
+  :type 'integer
+  :group 'axiom)
+
 (defvar axiom-spad-mode-syntax-table
   (copy-syntax-table axiom-common-syntax-table)
   "The Axiom SPAD mode syntax table.")
@@ -81,10 +86,21 @@
       (company-complete)
     (complete-symbol nil)))
 
+(defvar axiom-spad-indentation-increase-regexp
+  "\\(^[[:blank:]]*if\\|else$\\|repeat$\\|==$\\|:$\\|with\\|add\\)"
+  "Increase next line's indentation level if matched.")
+
 (defun axiom-spad-indent-line ()
   (if (eql (char-syntax (char-before)) ?w)
       (axiom-spad-interactive-complete)
-    (indent-relative-maybe)))
+    (let ((computed-indent (+ (axiom-find-previous-indent)
+                              (axiom-compute-indent-increment
+                               axiom-spad-indentation-increase-regexp
+                               axiom-spad-indentation-step))))
+      (if (or (eql (current-column) 0)
+              (axiom-in-indent-space))
+          (axiom-set-current-indent computed-indent)
+        (axiom-set-current-indent (axiom-find-previous-indent (current-column)))))))
 
 ;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"

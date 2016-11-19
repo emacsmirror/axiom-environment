@@ -26,6 +26,11 @@
   "Face used for displaying input file keywords."
   :group 'axiom)
 
+(defcustom axiom-input-indentation-step 2
+  "Indentation step to use in Axiom input mode buffers."
+  :type 'integer
+  :group 'axiom)
+
 (defvar axiom-input-mode-syntax-table
   (copy-syntax-table axiom-common-syntax-table)
   "The Axiom input mode syntax table.")
@@ -93,10 +98,21 @@
       (company-complete)
     (complete-symbol nil)))
 
+(defvar axiom-input-indentation-increase-regexp
+  "\\(^[[:blank:]]*if\\|else$\\|repeat$\\|==$\\)"
+  "When to increase next line's indentation level.")
+
 (defun axiom-input-indent-line ()
   (if (eql (char-syntax (char-before)) ?w)
       (axiom-input-interactive-complete)
-    (indent-relative-maybe)))
+    (let ((computed-indent (+ (axiom-find-previous-indent)
+                              (axiom-compute-indent-increment
+                               axiom-input-indentation-increase-regexp
+                               axiom-input-indentation-step))))
+      (if (or (eql (current-column) 0)
+              (axiom-in-indent-space))
+          (axiom-set-current-indent computed-indent)
+        (axiom-set-current-indent (axiom-find-previous-indent (current-column)))))))
 
 ;;;###autoload
 (define-derived-mode axiom-input-mode prog-mode "Axiom Input"
