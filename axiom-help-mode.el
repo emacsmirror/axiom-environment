@@ -1,6 +1,6 @@
 ;;; axiom-help-mode.el --- Major mode for Axiom help descriptions -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2016 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -43,7 +43,7 @@
   "Hook for customizing Axiom Help mode.")
 
 ;;;###autoload
-(define-derived-mode axiom-help-mode prog-mode "Axiom Help"
+(define-derived-mode axiom-help-mode fundamental-mode "Axiom Help"
   "Major mode for Axiom Help buffers."
   :group 'axiom
   (setq font-lock-defaults (list axiom-help-font-lock-keywords))
