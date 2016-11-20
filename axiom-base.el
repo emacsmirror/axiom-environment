@@ -65,8 +65,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions for generating/loading pre-computed data
 ;;
+(defvar axiom-environment-source-dir
+  (file-name-directory (or load-file-name (buffer-file-name)))
+  "Axiom environment source directory.")
+
 (defvar axiom-environment-data-dir
-  (and load-file-name (concat (file-name-directory load-file-name) "data/"))
+  (concat axiom-environment-source-dir "data/")
   "Axiom environment data directory.")
 
 (defun axiom-write-data-file (obj filename)

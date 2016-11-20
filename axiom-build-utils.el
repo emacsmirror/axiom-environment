@@ -15,6 +15,10 @@
 ;;; Code:
 
 (require 'axiom-base)
+(require 'axiom-process-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Data file creation routines
 
 (defvar axiom-build-query-buffer-name "*axiom-build-query*"
   "Name of buffer in which to process Axiom query results.")
@@ -95,9 +99,60 @@ TYPE should be either :package, :domain or :category."
                            axiom-standard-operation-info-file)))
 
 (defun axiom-make-standard-info-files ()
+  (interactive)
   (axiom-make-standard-package-info-file)
   (axiom-make-standard-domain-info-file)
   (axiom-make-standard-category-info-file)
   (axiom-make-standard-operation-info-file))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Emacs package creation routines
+
+(defcustom axiom-emacs-package-build-dir
+  (concat axiom-environment-source-dir "build/")
+  "Directory in which to place built packages."
+  :type 'string
+  :group 'axiom)
+
+(defcustom axiom-emacs-package-archive-loc
+  (concat axiom-environment-source-dir "archive/")
+  "Location to which built packages will be uploaded."
+  :type 'string
+  :group 'axiom)
+
+(defun axiom-environment-create-emacs-package (version-string &optional no-upload)
+  "Build and upload the axiom-environment Emacs package.
+Requires the package-build package to be installed from MELPA."
+  (interactive "MVersion string: \nP")
+  (require 'package-build)
+  (require 'package-x)
+  (unless (file-accessible-directory-p axiom-emacs-package-build-dir)
+    (error "Cannot write to directory: %s" axiom-emacs-package-build-dir))
+  (package-build-package "axiom-environment" version-string
+                         '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
+                           (:exclude "axiom.el" "ob-axiom.el"))
+                         axiom-environment-source-dir
+                         axiom-emacs-package-build-dir)
+  (unless no-upload
+    (let ((package-archive-upload-base axiom-emacs-package-archive-loc))
+      (package-upload-file (concat axiom-emacs-package-build-dir
+                                   "axiom-environment-" version-string ".tar")))))
+
+(defun ob-axiom-create-emacs-package (version-string &optional no-upload)
+  "Build and upload the ob-axiom Emacs package.
+Requires the package-build package to be installed from MELPA."
+  (interactive "MVersion string: \nP")
+  (require 'package-build)
+  (require 'package-x)
+  (unless (file-accessible-directory-p axiom-emacs-package-build-dir)
+    (error "Cannot write to directory: %s" axiom-emacs-package-build-dir))
+  (package-build-package "ob-axiom" version-string
+                         '("ob-axiom.el")
+                         axiom-environment-source-dir
+                         axiom-emacs-package-build-dir)
+  (unless no-upload
+    (let ((package-archive-upload-base axiom-emacs-package-archive-loc))
+      (package-upload-file (concat axiom-emacs-package-build-dir
+                                   "ob-axiom-" version-string ".el")))))
 
 ;;; axiom-build-utils.el ends here
