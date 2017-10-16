@@ -15,7 +15,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'company)
 
 (require 'axiom-base)
 (require 'axiom-help-mode)
@@ -50,7 +49,8 @@
        (let ((src-info (axiom-process-find-constructor-source arg)))
          (cons (first src-info) (second src-info)))))))
 
-(add-to-list 'company-backends 'axiom-company-backend)
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'axiom-company-backend))
 
 ;; Augment standard company-mode key bindings
 ;;
@@ -72,7 +72,8 @@
       (when (and popup axiom-select-popup-windows)
         (select-window popup)))))
 
-(define-key company-active-map (kbd "C-c C-d") #'axiom-company-display-doc-buffer)
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "C-c C-d") #'axiom-company-display-doc-buffer))
 
 (defun axiom-company-display-source-buffer ()
   "Jump to the source buffer for the current selection."
@@ -89,7 +90,8 @@
       (when (and popup axiom-select-popup-windows)
         (select-window popup)))))
 
-(define-key company-active-map (kbd "C-c C-s") #'axiom-company-display-source-buffer)
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "C-c C-s") #'axiom-company-display-source-buffer))
 
 (provide 'axiom-company)
 
