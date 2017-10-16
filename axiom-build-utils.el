@@ -1,6 +1,6 @@
 ;;; axiom-build-utils.el --- Utilities to help build the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -108,51 +108,42 @@ TYPE should be either :package, :domain or :category."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Emacs package creation routines
 
-(defcustom axiom-emacs-package-build-dir
-  (concat axiom-environment-source-dir "build/")
-  "Directory in which to place built packages."
-  :type 'string
-  :group 'axiom)
+(defvar axiom-environment-version "0.0.0")
 
-(defcustom axiom-emacs-package-archive-loc
-  (concat axiom-environment-source-dir "archive/")
-  "Location to which built packages will be uploaded."
-  :type 'string
-  :group 'axiom)
+(defvar ob-axiom-version "0.0.0")
 
-(defun axiom-environment-create-emacs-package (version-string &optional no-upload)
+(defvar axiom-environment-filespecs
+  '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
+    (:exclude "axiom.el" "ob-axiom.el")))
+
+(defun axiom-environment-make-emacs-package (src-dir pkg-dir)
   "Build and upload the axiom-environment Emacs package.
-Requires the package-build package to be installed from MELPA."
-  (interactive "MVersion string: \nP")
+Requires the `package-build' package to be installed"
+  (interactive "DProject source directory: \nDPackage upload directory: ")
   (require 'package-build)
   (require 'package-x)
-  (unless (file-accessible-directory-p axiom-emacs-package-build-dir)
-    (error "Cannot write to directory: %s" axiom-emacs-package-build-dir))
-  (package-build-package "axiom-environment" version-string
-                         '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
-                           (:exclude "axiom.el" "ob-axiom.el"))
-                         axiom-environment-source-dir
-                         axiom-emacs-package-build-dir)
-  (unless no-upload
-    (let ((package-archive-upload-base axiom-emacs-package-archive-loc))
-      (package-upload-file (concat axiom-emacs-package-build-dir
-                                   "axiom-environment-" version-string ".tar")))))
+  (unless (file-accessible-directory-p src-dir)
+    (error "Cannot write to directory: %s" src-dir))
+  (unless (file-accessible-directory-p pkg-dir)
+    (error "Cannot write to directory: %s" pkg-dir))
+  (package-build-package "axiom-environment" axiom-environment-version
+                         axiom-environment-filespecs src-dir src-dir)
+  (let ((package-archive-upload-base pkg-dir))
+    (package-upload-file (concat src-dir "axiom-environment-" axiom-environment-version ".tar"))))
 
-(defun ob-axiom-create-emacs-package (version-string &optional no-upload)
+(defun ob-axiom-make-emacs-package (src-dir pkg-dir)
   "Build and upload the ob-axiom Emacs package.
-Requires the package-build package to be installed from MELPA."
-  (interactive "MVersion string: \nP")
+Requires the `package-build' package to be installed."
+  (interactive "DProject source directory: \nDPackage upload directory: ")
   (require 'package-build)
   (require 'package-x)
-  (unless (file-accessible-directory-p axiom-emacs-package-build-dir)
-    (error "Cannot write to directory: %s" axiom-emacs-package-build-dir))
-  (package-build-package "ob-axiom" version-string
-                         '("ob-axiom.el")
-                         axiom-environment-source-dir
-                         axiom-emacs-package-build-dir)
-  (unless no-upload
-    (let ((package-archive-upload-base axiom-emacs-package-archive-loc))
-      (package-upload-file (concat axiom-emacs-package-build-dir
-                                   "ob-axiom-" version-string ".el")))))
+  (unless (file-accessible-directory-p src-dir)
+    (error "Cannot write to directory: %s" src-dir))
+  (unless (file-accessible-directory-p pkg-dir)
+    (error "Cannot write to directory: %s" pkg-dir))
+  (package-build-package "ob-axiom" ob-axiom-version
+                         '("ob-axiom.el") src-dir src-dir)
+  (let ((package-archive-upload-base pkg-dir))
+    (package-upload-file (concat src-dir "ob-axiom-" ob-axiom-version ".el"))))
 
 ;;; axiom-build-utils.el ends here
