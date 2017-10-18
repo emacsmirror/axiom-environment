@@ -19,6 +19,9 @@
 
 ;;; Code:
 
+(require 'package-build)
+(require 'package-x)
+
 (require 'axiom-base)
 (require 'axiom-process-mode)
 
@@ -124,13 +127,10 @@ TYPE should be either :package, :domain or :category."
     (:exclude "axiom.el" "ob-axiom.el")))
 
 (defun axiom-environment-make-emacs-package (src-dir pkg-dir pkg-ver)
-  "Build and upload the axiom-environment Emacs package.
-Requires the `package-build' package to be installed"
+  "Build and upload the axiom-environment Emacs package."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-directory-name "Package archive directory: ")
                      (read-string "Version string: " (axiom-gen-version-string))))
-  (require 'package-build)
-  (require 'package-x)
   (unless (file-accessible-directory-p src-dir)
     (error "Cannot write to directory: %s" src-dir))
   (unless (file-accessible-directory-p pkg-dir)
@@ -141,13 +141,10 @@ Requires the `package-build' package to be installed"
     (package-upload-file (concat src-dir "axiom-environment-" pkg-ver ".tar"))))
 
 (defun ob-axiom-make-emacs-package (src-dir pkg-dir pkg-ver)
-  "Build and upload the ob-axiom Emacs package.
-Requires the `package-build' package to be installed."
+  "Build and upload the ob-axiom Emacs package."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-directory-name "Package archive directory: ")
                      (read-string "Version string: " (axiom-gen-version-string))))
-  (require 'package-build)
-  (require 'package-x)
   (unless (file-accessible-directory-p src-dir)
     (error "Cannot write to directory: %s" src-dir))
   (unless (file-accessible-directory-p pkg-dir)
@@ -156,5 +153,35 @@ Requires the `package-build' package to be installed."
                          '("ob-axiom.el") src-dir src-dir)
   (let ((package-archive-upload-base pkg-dir))
     (package-upload-file (concat src-dir "ob-axiom-" pkg-ver ".el"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Force reload of all source files from this directory
+
+(defvar axiom-build-source-files
+  '("axiom-base"
+    "axiom-help-mode"
+    "axiom-process-mode"
+    "axiom-input-mode"
+    "axiom-spad-mode"
+    "axiom-boot-mode"
+    "axiom-buffer-menu"
+    "axiom-selector"
+    "axiom-company"
+    "ob-axiom"))
+
+(defun axiom-force-compile ()
+  (interactive)
+  (dolist (file axiom-build-source-files)
+    (byte-compile-file (concat axiom-build-source-dir file ".el"))))
+
+(defun axiom-force-load ()
+  (interactive)
+  (dolist (file axiom-build-source-files)
+    (load (concat axiom-build-source-dir file))))
+
+(defun axiom-force-build ()
+  (interactive)
+  (axiom-force-compile)
+  (axiom-force-load))
 
 ;;; axiom-build-utils.el ends here

@@ -49,10 +49,7 @@
 (require 'axiom-boot-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
-
-;; Load company-mode backend only if company-mode available
-(when (require 'company nil t)
-  (require 'axiom-company))
+(require 'axiom-company)
 
 ;; Automatically put .input, .spad and .boot files into the correct major mode.
 ;;;###autoload

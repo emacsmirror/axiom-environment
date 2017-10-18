@@ -466,16 +466,6 @@ continuation-lines (underscores escape new lines)."
       `(message ,msg)
     nil))
 
-(defun axiom-force-reload ()
-  (interactive)
-  (load "axiom-base")
-  (load "axiom-help-mode")
-  (load "axiom-process-mode")
-  (load "axiom-input-mode")
-  (load "axiom-spad-mode")
-  (load "axiom-buffer-menu")
-  (load "axiom-selector"))
-
 (provide 'axiom-base)
 
 ;;; axiom-base.el ends here
