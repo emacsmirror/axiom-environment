@@ -23,6 +23,8 @@
 (require 'ob-comint)
 (require 'ob-eval)
 
+(require 'cl-lib)
+
 (require 'axiom-environment)
 
 ;; Header arguments

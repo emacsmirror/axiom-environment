@@ -23,7 +23,6 @@
 
 ;;;###autoload
 (defun company-axiom-backend (command &optional arg &rest ignored)
-  (interactive (list 'interactive))
   (interactive
    (company-begin-backend 'company-axiom-backend))
   (cl-case command

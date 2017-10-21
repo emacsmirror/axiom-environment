@@ -1,6 +1,6 @@
 ;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -19,7 +19,8 @@
 ;;
 ;;;###autoload
 (defgroup axiom nil
-  "An environment for working with the Axiom computer algebra system.")
+  "An environment for working with the Axiom-family computer algebra systems."
+  :group 'languages)
 
 (defcustom axiom-select-popup-windows t
   "Set non-nil to automatically switch to popup windows."
@@ -294,8 +295,7 @@ otherwise return 0."
 
 (defun axiom-in-indent-space ()
   "Determine if point is inside the current line's indentation space."
-  (let ((match nil)
-        (eol nil))
+  (let ((match nil))
     (save-excursion
       (end-of-line)
       (let ((eol (point)))

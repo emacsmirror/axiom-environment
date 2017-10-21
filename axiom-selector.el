@@ -1,6 +1,6 @@
 ;;; axiom-selector.el --- A buffer selector utility for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -114,6 +114,9 @@ is chosen."
       (message "No Axiom SPAD buffer found"))))
 
 (define-axiom-selector-function ?b "List Axiom buffers"
+  (axiom-buffer-menu))
+
+(define-axiom-selector-function ?a "List all Axiom buffers"
   (axiom-buffer-menu))
 
 (provide 'axiom-selector)

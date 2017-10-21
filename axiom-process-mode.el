@@ -1,6 +1,6 @@
 ;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2016 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -483,7 +483,7 @@ buffer, otherwise do not display it."
 
 (defun axiom-process-make-all-clickables ()
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (while (re-search-forward "[[:word:]]+" nil t)
       (let* ((word (match-string-no-properties 0))
              (info (cond ((member word axiom-standard-package-names-and-abbreviations)
@@ -690,7 +690,8 @@ variable `axiom-process-webview-url'."
     (if location
 	(let ((buf (find-file (first location))))
 	  (switch-to-buffer buf)
-	  (goto-line (second location)))
+          (goto-char (point-min))
+          (forward-line (second location)))
       (message "Source not found"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
