@@ -117,42 +117,68 @@ TYPE should be either :package, :domain or :category."
 ;;; Emacs package creation routines
 
 (defvar axiom-build-source-dir
-  (file-name-directory (or load-file-name (buffer-file-name))))
+  (file-name-directory (or load-file-name (buffer-file-name)))
+  "The axiom-environment project source code directory.")
 
 (defun axiom-gen-version-string ()
   (format-time-string "%Y%m%d.%H%M" (current-time)))
 
-(defvar axiom-environment-filespecs
+(defvar axiom-build-axiom-environment-filespecs
   '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
-    (:exclude "axiom.el" "ob-axiom.el")))
+    (:exclude "axiom.el" "ob-axiom.el" "company-axiom.el")))
 
-(defun axiom-environment-make-emacs-package (src-dir pkg-dir pkg-ver)
+(defvar axiom-build-ob-axiom-filespecs
+  '("ob-axiom.el"))
+
+(defvar axiom-build-company-axiom-filespecs
+  '("company-axiom.el"))
+
+(defun axiom-build-emacs-package (src-dir pkg-dir pkg-filespecs pkg-name pkg-ver)
+  (unless (file-accessible-directory-p src-dir)
+    (error "Cannot write to directory: %s" src-dir))
+  (unless (file-accessible-directory-p pkg-dir)
+    (error "Cannot write to directory: %s" pkg-dir))
+  (package-build-package pkg-name pkg-ver pkg-filespecs src-dir src-dir)
+  (let* ((package-archive-upload-base pkg-dir)
+         (pkg-basename (concat src-dir pkg-name "-" pkg-ver))
+         (pkg-filename (if (file-readable-p (concat pkg-basename ".el"))
+                           (concat pkg-basename ".el")
+                         (concat pkg-basename ".tar"))))
+    (package-upload-file pkg-filename)))
+
+(defun axiom-build-axiom-environment-package (src-dir pkg-dir pkg-ver)
   "Build and upload the axiom-environment Emacs package."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-directory-name "Package archive directory: ")
                      (read-string "Version string: " (axiom-gen-version-string))))
-  (unless (file-accessible-directory-p src-dir)
-    (error "Cannot write to directory: %s" src-dir))
-  (unless (file-accessible-directory-p pkg-dir)
-    (error "Cannot write to directory: %s" pkg-dir))
-  (package-build-package "axiom-environment" pkg-ver
-                         axiom-environment-filespecs src-dir src-dir)
-  (let ((package-archive-upload-base pkg-dir))
-    (package-upload-file (concat src-dir "axiom-environment-" pkg-ver ".tar"))))
+  (axiom-build-emacs-package src-dir pkg-dir axiom-build-axiom-environment-filespecs
+                             "axiom-environment" pkg-ver))
 
-(defun ob-axiom-make-emacs-package (src-dir pkg-dir pkg-ver)
+(defun axiom-build-ob-axiom-package (src-dir pkg-dir pkg-ver)
   "Build and upload the ob-axiom Emacs package."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-directory-name "Package archive directory: ")
                      (read-string "Version string: " (axiom-gen-version-string))))
-  (unless (file-accessible-directory-p src-dir)
-    (error "Cannot write to directory: %s" src-dir))
-  (unless (file-accessible-directory-p pkg-dir)
-    (error "Cannot write to directory: %s" pkg-dir))
-  (package-build-package "ob-axiom" pkg-ver
-                         '("ob-axiom.el") src-dir src-dir)
-  (let ((package-archive-upload-base pkg-dir))
-    (package-upload-file (concat src-dir "ob-axiom-" pkg-ver ".el"))))
+  (axiom-build-emacs-package src-dir pkg-dir axiom-build-ob-axiom-filespecs
+                             "ob-axiom" pkg-ver))
+
+(defun axiom-build-company-axiom-package (src-dir pkg-dir pkg-ver)
+  "Build and upload the company-axiom Emacs package."
+  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
+                     (read-directory-name "Package archive directory: ")
+                     (read-string "Version string: " (axiom-gen-version-string))))
+  (axiom-build-emacs-package src-dir pkg-dir axiom-build-company-axiom-filespecs
+                             "company-axiom" pkg-ver))
+
+(defun axiom-build-all-emacs-packages (src-dir pkg-dir pkg-ver)
+  "Build and upload all axiom-environment project packages.
+Note: they will all have the same version number."
+  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
+                     (read-directory-name "Package archive directory: ")
+                     (read-string "Version string: " (axiom-gen-version-string))))
+  (axiom-build-axiom-environment-package src-dir pkg-dir pkg-ver)
+  (axiom-build-ob-axiom-package src-dir pkg-dir pkg-ver)
+  (axiom-build-company-axiom-package src-dir pkg-dir pkg-ver))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Force reload of all source files from this directory
@@ -166,20 +192,23 @@ TYPE should be either :package, :domain or :category."
     "axiom-boot-mode"
     "axiom-buffer-menu"
     "axiom-selector"
-    "axiom-company"
-    "ob-axiom"))
+    "ob-axiom"
+    "company-axiom"))
 
 (defun axiom-force-compile ()
+  "Compile all files in `axiom-build-source-dir' directory."
   (interactive)
   (dolist (file axiom-build-source-files)
     (byte-compile-file (concat axiom-build-source-dir file ".el"))))
 
 (defun axiom-force-load ()
+  "Load all files in `axiom-build-source-dir' directory."
   (interactive)
   (dolist (file axiom-build-source-files)
     (load (concat axiom-build-source-dir file))))
 
 (defun axiom-force-build ()
+  "Compile and load all files in `axiom-build-source-dir' directory."
   (interactive)
   (axiom-force-compile)
   (axiom-force-load))
