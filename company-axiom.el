@@ -1,33 +1,37 @@
-;;; axiom-company.el --- support for company-mode -*- lexical-binding: t -*-
+;;; company-axiom.el --- A company-mode backend for the axiom-environment system -*- lexical-binding: t -*-
 
-;; Copyright (C) 2016 Paul Onions
+;; Copyright (C) 2016 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
-;; Keywords: Axiom, OpenAxiom, FriCAS
+;; Keywords: Axiom, OpenAxiom, FriCAS, axiom-environment
 
 ;; This file is free software, see the LICENCE file in this directory
 ;; for copying terms.
 
+;; Package-Requires: ((axiom-environment "20171021"))
+
 ;;; Commentary:
 
-;; Backend routines to support company-mode name completion.
+;; Backend routines to support company-mode name completion in
+;; axiom-environment buffers.
 
 ;;; Code:
 
 (require 'cl-lib)
 
-(require 'axiom-base)
-(require 'axiom-help-mode)
-(require 'axiom-process-mode)
+(require 'axiom-environment)
 
-(defun axiom-company-backend (command &optional arg &rest ignored)
+;;;###autoload
+(defun company-axiom-backend (command &optional arg &rest ignored)
   (interactive (list 'interactive))
+  (interactive
+   (company-begin-backend 'company-axiom-backend))
   (cl-case command
-    (interactive (company-begin-backend 'axiom-company-backend))
-    (prefix (and (or (eql major-mode 'axiom-process-mode)
-                     (eql major-mode 'axiom-input-mode)
-                     (eql major-mode 'axiom-spad-mode))
-                 (company-grab-symbol)))
+    (prefix
+     (and (or (eql major-mode 'axiom-process-mode)
+              (eql major-mode 'axiom-input-mode)
+              (eql major-mode 'axiom-spad-mode))
+          (company-grab-symbol)))
     (candidates
      (cl-remove-if-not
       (lambda (c) (string-prefix-p arg c))
@@ -49,8 +53,9 @@
        (let ((src-info (axiom-process-find-constructor-source arg)))
          (cons (first src-info) (second src-info)))))))
 
+;;;###autoload
 (eval-after-load 'company
-  '(add-to-list 'company-backends 'axiom-company-backend))
+  '(add-to-list 'company-backends 'company-axiom-backend))
 
 ;; Augment standard company-mode key bindings
 ;;
@@ -59,7 +64,11 @@
 ;; when the completion menu is showing.  However, they do not allow
 ;; you to jump to these buffers.  So we add some extra bindings that
 ;; do this: "C-c C-d" and "C-c C-s", respectively.
-(defun axiom-company-display-doc-buffer ()
+;;
+;; Also add "C-c C-w" to bring up web documentation for the selected
+;; item in the completion menu.
+;;
+(defun company-axiom-display-doc-buffer ()
   "Jump to the documentation buffer for the current selection."
   (interactive)
   (let* ((selected (nth company-selection company-candidates))
@@ -73,9 +82,9 @@
         (select-window popup)))))
 
 (eval-after-load 'company
-  '(define-key company-active-map (kbd "C-c C-d") #'axiom-company-display-doc-buffer))
+  '(define-key company-active-map (kbd "C-c C-d") #'company-axiom-display-doc-buffer))
 
-(defun axiom-company-display-source-buffer ()
+(defun company-axiom-display-source-buffer ()
   "Jump to the source buffer for the current selection."
   (interactive)
   (let* ((selected (nth company-selection company-candidates))
@@ -91,8 +100,17 @@
         (select-window popup)))))
 
 (eval-after-load 'company
-  '(define-key company-active-map (kbd "C-c C-s") #'axiom-company-display-source-buffer))
+  '(define-key company-active-map (kbd "C-c C-s") #'company-axiom-display-source-buffer))
 
-(provide 'axiom-company)
+(defun company-axiom-display-web-page ()
+  "Jump to the web page for the current selection."
+  (interactive)
+  (let ((selected (nth company-selection company-candidates)))
+    (axiom-process-webview-constructor selected)))
 
-;;; axiom-company.el ends here
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "C-c C-w") #'company-axiom-display-web-page))
+
+(provide 'company-axiom)
+
+;;; company-axiom.el ends here
