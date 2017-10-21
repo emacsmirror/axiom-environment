@@ -107,8 +107,10 @@
   "Major mode for Axiom's SPAD language."
   :group 'axiom
   (setq font-lock-defaults (list axiom-spad-font-lock-keywords))
-  (setq indent-line-function 'axiom-spad-indent-line)
   (setq electric-indent-inhibit t)
+  (make-local-variable 'indent-line-function)
+  (make-local-variable 'completion-at-point-functions)
+  (setq indent-line-function 'axiom-spad-indent-line)
   (setq completion-at-point-functions '(axiom-spad-complete-symbol))
   (setq axiom-menu-compile-buffer-enable t)
   (setq axiom-menu-compile-file-enable t)

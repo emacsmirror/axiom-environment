@@ -119,8 +119,10 @@
   "Major mode for the Axiom-Input interactive language."
   :group 'axiom
   (setq font-lock-defaults (list 'axiom-input-font-lock-keywords))
-  (setq indent-line-function 'axiom-input-indent-line)
   (setq electric-indent-inhibit t)
+  (make-local-variable 'indent-line-function)
+  (make-local-variable 'completion-at-point-functions)
+  (setq indent-line-function 'axiom-input-indent-line)
   (setq completion-at-point-functions '(axiom-input-complete-symbol))
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable nil)

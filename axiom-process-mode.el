@@ -802,8 +802,10 @@ variable `axiom-process-webview-url'."
                                      "\\|" axiom-process-break-prompt-regexp "\\)"))
   (setq comint-get-old-input (function axiom-process-get-old-input))
   (setq font-lock-defaults (list axiom-process-font-lock-keywords))
-  (setq indent-line-function 'axiom-process-indent-line)
   (setq electric-indent-inhibit t)
+  (make-local-variable 'indent-line-function)
+  (make-local-variable 'completion-at-point-functions)
+  (setq indent-line-function 'axiom-process-indent-line)
   (setq completion-at-point-functions '(axiom-process-complete-command-line
                                         axiom-process-complete-symbol))
   (setq axiom-menu-compile-buffer-enable nil)
