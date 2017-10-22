@@ -151,15 +151,18 @@ TYPE should be either :package, :domain or :category."
                          (concat pkg-basename ".tar"))))
     (package-upload-file pkg-filename)))
 
+(defun axiom-build-interactive-args ()
+  (list (read-directory-name "Project source directory: " axiom-build-source-dir)
+        (completing-read "Package archive: " (mapcar 'car package-archives))
+        (read-string "Version string: " (axiom-build-gen-version-string))))
+
 (defun axiom-build-axiom-environment-package (src-dir archive pkg-ver)
   "Build and upload the axiom-environment Emacs package.
 
 Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
-  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
-                     (read-string "Package archive: ")
-                     (read-string "Version string: " (axiom-build-gen-version-string))))
+  (interactive (axiom-build-interactive-args))
   (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
                              axiom-build-axiom-environment-filespecs
                              "axiom-environment" pkg-ver))
@@ -170,9 +173,7 @@ of those specified in the `package-archives' variable."
 Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
-  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
-                     (read-string "Package archive: ")
-                     (read-string "Version string: " (axiom-build-gen-version-string))))
+  (interactive (axiom-build-interactive-args))
   (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
                              axiom-build-ob-axiom-filespecs
                              "ob-axiom" pkg-ver))
@@ -183,9 +184,7 @@ of those specified in the `package-archives' variable."
 Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
-  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
-                     (read-string "Package archive: ")
-                     (read-string "Version string: " (axiom-build-gen-version-string))))
+  (interactive (axiom-build-interactive-args))
   (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
                              axiom-build-company-axiom-filespecs
                              "company-axiom" pkg-ver))
@@ -198,9 +197,7 @@ package version string.  The package archive name should be one
 of those specified in the `package-archives' variable.
 
 All packages will have the same version number."
-  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
-                     (read-string "Package archive: ")
-                     (read-string "Version string: " (axiom-build-gen-version-string))))
+  (interactive (axiom-build-interactive-args))
   (axiom-build-axiom-environment-package src-dir archive pkg-ver)
   (axiom-build-ob-axiom-package src-dir archive pkg-ver)
   (axiom-build-company-axiom-package src-dir archive pkg-ver))
@@ -214,9 +211,7 @@ of those specified in the `package-archives' variable.
 
 Any already installed versions will be removed first.  All
 generated packages will have the same version number."
-  (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
-                     (read-string "Package archive: ")
-                     (read-string "Version string: " (axiom-build-gen-version-string))))
+  (interactive (axiom-build-interactive-args))
   (message "Building new packages")
   (axiom-build-axiom-environment-package src-dir archive pkg-ver)
   (axiom-build-ob-axiom-package src-dir archive pkg-ver)
