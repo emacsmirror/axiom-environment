@@ -129,7 +129,8 @@ TYPE should be either :package, :domain or :category."
 
 (defvar axiom-build-axiom-environment-filespecs
   '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
-    (:exclude "axiom.el" "ob-axiom.el" "company-axiom.el")))
+    (:exclude "axiom.el" "axiom-build-utils.el"
+              "ob-axiom.el" "company-axiom.el")))
 
 (defvar axiom-build-ob-axiom-filespecs
   '("ob-axiom.el"))
@@ -296,7 +297,7 @@ generated packages will have the same version number."
 (defun axiom-build-build ()
   "Compile and load all files in `axiom-build-source-dir' directory."
   (interactive)
-  (axiom-force-compile)
-  (axiom-force-load))
+  (axiom-build-compile)
+  (axiom-build-load))
 
 ;;; axiom-build-utils.el ends here
