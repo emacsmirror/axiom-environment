@@ -139,12 +139,12 @@ TYPE should be either :package, :domain or :category."
 
 (defun axiom-build-emacs-package (src-dir arc-dir pkg-filespecs pkg-name pkg-ver)
   (unless (and src-dir (file-accessible-directory-p src-dir))
-    (error "Cannot write to directory: %s" src-dir))
+    (error "Cannot find source directory: %s" src-dir))
   (unless (and arc-dir (file-accessible-directory-p arc-dir))
-    (error "Cannot write to directory: %s" arc-dir))
-  (package-build-package pkg-name pkg-ver pkg-filespecs src-dir src-dir)
+    (error "Cannot find archive directory: %s" arc-dir))
+  (package-build-package pkg-name pkg-ver pkg-filespecs src-dir temporary-file-directory)
   (let* ((package-archive-upload-base arc-dir)
-         (pkg-basename (concat src-dir pkg-name "-" pkg-ver))
+         (pkg-basename (concat temporary-file-directory pkg-name "-" pkg-ver))
          (pkg-filename (if (file-readable-p (concat pkg-basename ".el"))
                            (concat pkg-basename ".el")
                          (concat pkg-basename ".tar"))))
@@ -154,7 +154,8 @@ TYPE should be either :package, :domain or :category."
   "Build and upload the axiom-environment Emacs package.
 
 Specifying project source directory, package archive name and
-package version string."
+package version string.  The package archive name should be one
+of those specified in the `package-archives' variable."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-string "Package archive: ")
                      (read-string "Version string: " (axiom-build-gen-version-string))))
@@ -166,7 +167,8 @@ package version string."
   "Build and upload the ob-axiom Emacs package.
 
 Specifying project source directory, package archive name and
-package version string."
+package version string.  The package archive name should be one
+of those specified in the `package-archives' variable."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-string "Package archive: ")
                      (read-string "Version string: " (axiom-build-gen-version-string))))
@@ -178,7 +180,8 @@ package version string."
   "Build and upload the company-axiom Emacs package.
 
 Specifying project source directory, package archive name and
-package version string."
+package version string.  The package archive name should be one
+of those specified in the `package-archives' variable."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-string "Package archive: ")
                      (read-string "Version string: " (axiom-build-gen-version-string))))
@@ -190,8 +193,10 @@ package version string."
   "Build and upload all axiom-environment project packages.
 
 Specifying project source directory, package archive name and
-package version string.  All packages will have the same version
-number."
+package version string.  The package archive name should be one
+of those specified in the `package-archives' variable.
+
+All packages will have the same version number."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-string "Package archive: ")
                      (read-string "Version string: " (axiom-build-gen-version-string))))
@@ -203,11 +208,14 @@ number."
   "Build, upload and install all axiom-environment project packages.
 
 Specifying project source directory, package archive name and
-package version string.  Previous versions will be removed first.
-All packages will have the same version number."
+package version string.  The package archive name should be one
+of those specified in the `package-archives' variable.
+
+Any already installed versions will be removed first.  All
+generated packages will have the same version number."
   (interactive (list (read-directory-name "Project source directory: " axiom-build-source-dir)
                      (read-string "Package archive: ")
-                     (read-string "Package version string: " (axiom-build-gen-version-string))))
+                     (read-string "Version string: " (axiom-build-gen-version-string))))
   (message "Building new packages")
   (axiom-build-axiom-environment-package src-dir archive pkg-ver)
   (axiom-build-ob-axiom-package src-dir archive pkg-ver)
