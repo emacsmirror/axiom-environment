@@ -28,6 +28,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Data file creation routines
 
+(defvar axiom-build-source-dir
+  (file-name-directory (or load-file-name (buffer-file-name)))
+  "The axiom-environment project source code directory.")
+
+(defvar axiom-build-data-dir
+  (concat axiom-build-source-dir "data/")
+  "The axiom-environment project data directory.")
+
 (defvar axiom-build-query-buffer-name "*axiom-build-query*"
   "Name of buffer in which to process Axiom query results.")
 
@@ -84,27 +92,27 @@ TYPE should be either :package, :domain or :category."
           names-list))
 
 (defun axiom-make-standard-package-info-file ()
-  (let ((default-directory axiom-environment-data-dir))
-    (axiom-write-data-file (axiom-make-abbreviations-alist
-                            (axiom-get-constructor-names-list :package))
-                           axiom-standard-package-info-file)))
+  (axiom-write-data-file (axiom-make-abbreviations-alist
+                          (axiom-get-constructor-names-list :package))
+                         (concat axiom-build-data-dir
+                                 axiom-standard-package-info-file)))
 
 (defun axiom-make-standard-domain-info-file ()
-  (let ((default-directory axiom-environment-data-dir))
-    (axiom-write-data-file (axiom-make-abbreviations-alist
-                            (axiom-get-constructor-names-list :domain))
-                           axiom-standard-domain-info-file)))
+  (axiom-write-data-file (axiom-make-abbreviations-alist
+                          (axiom-get-constructor-names-list :domain))
+                         (concat axiom-build-data-dir
+                                 axiom-standard-domain-info-file)))
 
 (defun axiom-make-standard-category-info-file ()
-  (let ((default-directory axiom-environment-data-dir))
-    (axiom-write-data-file (axiom-make-abbreviations-alist
-                            (axiom-get-constructor-names-list :category))
-                           axiom-standard-category-info-file)))
+  (axiom-write-data-file (axiom-make-abbreviations-alist
+                          (axiom-get-constructor-names-list :category))
+                         (concat axiom-build-data-dir
+                                 axiom-standard-category-info-file)))
 
 (defun axiom-make-standard-operation-info-file ()
-  (let ((default-directory axiom-environment-data-dir))
-    (axiom-write-data-file (axiom-get-operation-names-list)
-                           axiom-standard-operation-info-file)))
+  (axiom-write-data-file (axiom-get-operation-names-list)
+                         (concat axiom-build-data-dir
+                                 axiom-standard-operation-info-file)))
 
 (defun axiom-make-standard-info-files ()
   (interactive)
@@ -115,10 +123,6 @@ TYPE should be either :package, :domain or :category."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Emacs package creation routines
-
-(defvar axiom-build-source-dir
-  (file-name-directory (or load-file-name (buffer-file-name)))
-  "The axiom-environment project source code directory.")
 
 (defun axiom-build-gen-version-string (&optional time)
   (concat (format-time-string "%Y%m%d." (or time (current-time)))
