@@ -17,6 +17,12 @@
 ;; development & presentation style with easy publishing to HTML, PDF,
 ;; etc.
 
+;; To enable this extension put
+;;
+;;  (require 'ob-axiom)
+;;
+;; in your ~/.emacs initialisation file.
+
 ;;; Code:
 (require 'ob)
 (require 'ob-ref)
