@@ -1,6 +1,6 @@
 ;;; axiom-buffer-menu.el --- Display a list of Axiom buffers -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -207,8 +207,7 @@
 
 (defun axiom-buffer-menu-prepare-buffer ()
   "Setup the Axiom Buffer Menu buffer."
-  (save-excursion
-    (set-buffer (get-buffer-create axiom-buffer-menu-bufname))
+  (with-current-buffer (get-buffer-create axiom-buffer-menu-bufname)
     (setq buffer-read-only nil)
     (erase-buffer)
     (setq standard-output (current-buffer))

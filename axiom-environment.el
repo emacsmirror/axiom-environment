@@ -12,13 +12,13 @@
 
 ;;; Commentary:
 
-;; The ``axiom-environment'' package is intended to make it easier to
+;; The `axiom-environment' package is intended to make it easier to
 ;; work with, and understand, the Axiom, OpenAxiom and FriCAS computer
 ;; algebra systems.  It implements four different major modes for the
 ;; Emacs text editor:
 
 ;;   1. axiom-process-mode: for interaction with a running Axiom
-;;   process.
+;;      process.
 
 ;;   2. axiom-help-mode: for displaying help information about the
 ;;      Axiom system.
@@ -35,8 +35,18 @@
 ;; their operations.  The syntax highlighting feature allows to see
 ;; at a glance which aspect of the type system we are concerned with
 ;; (domains or categories), and the popup buffer feature allows to
-;; examine (and re-examine) these types without interupting the
+;; examine (and re-examine) these types without interrupting the
 ;; workflow (i.e. interaction in the Axiom REPL).
+
+;; Once the package is installed, files ending in .input, and .spad
+;; are put into the appropriate mode, and there is an "M-x run-axiom"
+;; command available to start an interactive Axiom/OpenAxiom/FriCAS
+;; session.  Look into the Axiom menu that appears in these buffers to
+;; discover further capabilities of the system.
+
+;; There are also related packages available: `ob-axiom' and
+;; `company-axiom', providing backends for `org-babel' and
+;; `company-mode', respectively.
 
 ;;; Code:
 
@@ -49,10 +59,6 @@
 (require 'axiom-boot-mode)
 (require 'axiom-buffer-menu)
 (require 'axiom-selector)
-
-;; Load company-mode backend only if company-mode available
-;; (when (require 'company nil t)
-;;   (require 'axiom-company))
 
 ;; Automatically put .input, .spad and .boot files into the correct major mode.
 ;;;###autoload

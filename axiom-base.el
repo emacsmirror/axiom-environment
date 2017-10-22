@@ -1,6 +1,6 @@
 ;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -19,7 +19,8 @@
 ;;
 ;;;###autoload
 (defgroup axiom nil
-  "An environment for working with the Axiom computer algebra system.")
+  "An environment for working with the Axiom-family computer algebra systems."
+  :group 'languages)
 
 (defcustom axiom-select-popup-windows t
   "Set non-nil to automatically switch to popup windows."
@@ -65,8 +66,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions for generating/loading pre-computed data
 ;;
+(defvar axiom-environment-source-dir
+  (file-name-directory (or load-file-name (buffer-file-name)))
+  "Axiom environment source directory.")
+
 (defvar axiom-environment-data-dir
-  (and load-file-name (concat (file-name-directory load-file-name) "data/"))
+  (concat axiom-environment-source-dir "data/")
   "Axiom environment data directory.")
 
 (defun axiom-write-data-file (obj filename)
@@ -290,8 +295,7 @@ otherwise return 0."
 
 (defun axiom-in-indent-space ()
   "Determine if point is inside the current line's indentation space."
-  (let ((match nil)
-        (eol nil))
+  (let ((match nil))
     (save-excursion
       (end-of-line)
       (let ((eol (point)))
@@ -461,16 +465,6 @@ continuation-lines (underscores escape new lines)."
   (if axiom-debug
       `(message ,msg)
     nil))
-
-(defun axiom-force-reload ()
-  (interactive)
-  (load "axiom-base")
-  (load "axiom-help-mode")
-  (load "axiom-process-mode")
-  (load "axiom-input-mode")
-  (load "axiom-spad-mode")
-  (load "axiom-buffer-menu")
-  (load "axiom-selector"))
 
 (provide 'axiom-base)
 

@@ -21,27 +21,31 @@ The main features of these modes (so far) are syntax highlighting to
 display package, domain & category names (and their abbreviations) in
 distinct colours, and to give quick access to popup buffers displaying
 summary information about these types and their operations.  The
-syntax highlighting feature allows us to see at a glance which aspect
-of the type system we are concerned with (domains or categories), and
-the popup buffer feature allows us to examine (and re-examine) these
-types without interupting our workflow (i.e. interaction in the Axiom
-REPL).  Hint: to make a popup help buffer go away, press ``q'',
-emacs's window configuration will be restored to what it was before
-the help window appeared and the help buffer will be buried in the
-buffer list.
+syntax highlighting feature allows to see at a glance which aspect of
+the type system we are concerned with (domains or categories), and the
+popup buffer feature allows to examine (and re-examine) these types
+without interupting the workflow (i.e. interaction in the Axiom REPL).
+
+Hint: to make a popup help buffer go away, press ``q'', emacs's window
+configuration will be restored to what it was before the help window
+appeared and the help buffer will be buried in the buffer list.
 
 The ``ob-axiom'' package is an org-babel extension that integrates the
 axiom-environment into org-mode, allowing a literate development &
 presentation style with easy publishing to HTML, PDF, etc.
 
+The ``company-axiom'' package is a company-mode backend for symbol
+completion in the company framework.
+
 
 INSTALLATION
 ============
 
-The easiest way to install the axiom-environment and ob-axiom packages
-is via MELPA, the Emacs lisp package server.  First ensure that you
-have access to the MELPA package repository (by putting the following
-in your .emacs file if it's not there already):-
+The easiest way to install axiom-environment (and optionally the
+ob-axiom and company-axiom packages) is via MELPA, the Emacs lisp
+package server.  First ensure that you have access to the MELPA
+package repository (by putting the following in your .emacs file if
+it's not there already):-
 
   (require 'package)
   (add-to-list 'package-archives
@@ -51,7 +55,8 @@ then simply do
 
   M-x list-packages
 
-and select and install the axiom-environment and ob-axiom packages.
+and select and install the axiom-environment and possibly ob-axiom and
+company-axiom packages.
 
 Alternatively, if you don't want to use MELPA, you can clone the
 axiom-environment mercurial repository (hosted at bitbucket.org) into
@@ -65,10 +70,11 @@ then add the following line to your .emacs file:
 
   (load-file "/my/directory/of/choice/axiom-environment/axiom.el")
 
-This will load the axiom-environment and ob-axiom systems directly.
+This will load the axiom-environment, ob-axiom and company-axiom
+systems directly.
 
 Either way you install it, this will allow Emacs to automatically put
-.spad and .input files into ``Axiom SPAD'' and ``Axiom Input'' mode,
+.spad and .input files into ``Axiom SPAD'' and ``Axiom Input'' modes,
 respectively, and give access to the ``Axiom'' menu in these modes.
 See the menu for shortcuts to the helper commands.
 
@@ -80,7 +86,7 @@ sequence that is accessible from any buffer.  For example
 
 in your .emacs file will do nicely.  Then you can do `C-c a ?' to
 bring up a summary of selector commands.  Highlights include `C-c a r'
-to switch to the Axiom REPL buffer, and 'C-c a b' to bring up a buffer
+to switch to the Axiom REPL buffer, and 'C-c a a' to bring up a buffer
 listing all available Axiom buffers and allowing you to select one to
 switch to, or display in another window.  Type `?' or the usual `C-h
 m' to bring up a summary of Axiom Buffer Menu mode's commands.
@@ -117,8 +123,8 @@ BUGS
 ====
 
 Testing so far has been with Axiom, OpenAxiom and FriCAS running on
-MacOSX (the latter two built with SBCL).  It should of course run on
-other OSes too.
+macOS and Linux (with OpenAxiom and FriCAS built with SBCL).  It
+should of course run on other OSes too.
 
 It should be noted that most development work is done with FriCAS, so
 this is likely to give the least problematic user experience.
@@ -135,4 +141,4 @@ and enter the details there.
 
 --
 Paul Onions
-4 August 2015
+22 October 2017

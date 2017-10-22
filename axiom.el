@@ -1,6 +1,6 @@
 ;;; axiom.el --- A load-file for the axiom-environment system -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2015 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -10,9 +10,9 @@
 
 ;;; Commentary:
 
-;; This is a simple load-file to set up the ``axiom-environment'' and
-;; ``ob-axiom'' packages without using the Emacs packaging system.
-;; Use it by putting
+;; This is a simple load-file to set up the `axiom-environment',
+;; `ob-axiom' and `company-axiom' packages without using the Emacs
+;; packaging system.  Use it by putting
 ;;
 ;;   (load-file "/FULL/PATH/NAME/OF/THIS/FILE")
 ;;
@@ -33,6 +33,9 @@
 
 ;; Load the org-babel interface
 (require 'ob-axiom)
+
+;; Load the company-axion backend
+(require 'company-axiom)
 
 ;; Uncomment this to enable axiom-selector on C-c a
 ;;(global-set-key (kbd "C-c a") 'axiom-selector)
