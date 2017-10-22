@@ -23,6 +23,8 @@
 
 ;;;###autoload
 (defun company-axiom-backend (command &optional arg &rest ignored)
+  "A company backend for axiom-environment.
+See company documentation for COMMAND, ARG and IGNORED syntax."
   (interactive
    (company-begin-backend 'company-axiom-backend))
   (cl-case command
