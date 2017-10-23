@@ -8,7 +8,7 @@
 ;; This file is free software, see the LICENCE file in this directory
 ;; for copying terms.
 
-;; Package-Requires: ((axiom-environment "20171021") (company))
+;; Package-Requires: ((emacs "24") (company "0.9") (axiom-environment "20171021"))
 
 ;;; Commentary:
 
