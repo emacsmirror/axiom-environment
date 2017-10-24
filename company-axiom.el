@@ -36,7 +36,9 @@ See company documentation for COMMAND, ARG and IGNORED syntax."
     (candidates
      (cl-remove-if-not
       (lambda (c) (string-prefix-p arg c))
-      axiom-standard-names-and-abbreviations))
+      (if (eql major-mode 'axiom-spad-mode)
+          axiom-standard-names
+        axiom-standard-names-and-abbreviations)))
     (annotation
      (cl-case (car (axiom-process-constructor-type arg))
        (:package  " [P]")

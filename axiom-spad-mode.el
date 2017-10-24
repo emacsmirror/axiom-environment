@@ -56,14 +56,11 @@
 (defvar axiom-spad-category-face    'axiom-category-name)
 
 (defvar axiom-spad-font-lock-keywords
-  (list (cons axiom-spad-doc-comment-regexp                'axiom-spad-doc-comment-face)
-        (cons axiom-spad-keywords-regexp                   'axiom-spad-keyword-face)
-        (cons axiom-standard-package-names-regexp          'axiom-spad-package-face)
-        (cons axiom-standard-package-abbreviations-regexp  'axiom-spad-package-face)
-        (cons axiom-standard-domain-names-regexp           'axiom-spad-domain-face)
-        (cons axiom-standard-domain-abbreviations-regexp   'axiom-spad-domain-face)
-        (cons axiom-standard-category-names-regexp         'axiom-spad-category-face)
-        (cons axiom-standard-category-abbreviations-regexp 'axiom-spad-category-face)))
+  (list (cons axiom-spad-doc-comment-regexp        'axiom-spad-doc-comment-face)
+        (cons axiom-spad-keywords-regexp           'axiom-spad-keyword-face)
+        (cons axiom-standard-package-names-regexp  'axiom-spad-package-face)
+        (cons axiom-standard-domain-names-regexp   'axiom-spad-domain-face)
+        (cons axiom-standard-category-names-regexp 'axiom-spad-category-face)))
 
 (defvar axiom-spad-mode-map
   (let ((map (make-sparse-keymap)))
@@ -78,7 +75,7 @@
   (and (looking-back "[[:word:]]+" nil t)
        (list (match-beginning 0)
              (match-end 0)
-             axiom-standard-names-and-abbreviations)))
+             axiom-standard-names)))
 
 (defun axiom-spad-interactive-complete ()
   (interactive)
