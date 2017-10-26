@@ -59,12 +59,12 @@ and select and install the axiom-environment and possibly ob-axiom and
 company-axiom packages.
 
 Alternatively, if you don't want to use MELPA, you can clone the
-axiom-environment mercurial repository (hosted at bitbucket.org) into
+axiom-environment git repository (hosted at bitbucket.org) into
 your directory of choice:
 
   cd /my/directory/of/choice
 
-  hg clone http://bitbucket.org/pdo/axiom-environment
+  git clone http://bitbucket.org/pdo/axiom-environment
 
 then add the following line to your .emacs file:
 
