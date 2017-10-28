@@ -1,6 +1,6 @@
 ;;; axiom-spad-mode.el --- Major mode for the Axiom library language -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2016 Paul Onions
+;; Copyright (C) 2013 - 2017 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -99,6 +99,13 @@
           (axiom-set-current-indent computed-indent)
         (axiom-set-current-indent (axiom-find-previous-indent (current-column)))))))
 
+(defvar axiom-spad-syntax-propertize-fn
+  (syntax-propertize-rules
+   ("\\(-\\)\\(-\\)"     (1 (string-to-syntax "< 1"))
+                         (2 (string-to-syntax "< 2")))
+   ("\\(\\+\\)\\(\\+\\)" (1 (string-to-syntax "< 1"))
+                         (2 (string-to-syntax "< 2")))))
+
 ;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"
   "Major mode for Axiom's SPAD language."
@@ -107,8 +114,14 @@
   (setq electric-indent-inhibit t)
   (make-local-variable 'indent-line-function)
   (make-local-variable 'completion-at-point-functions)
+  (make-local-variable 'syntax-propertize-function)
+  (make-local-variable 'adaptive-fill-first-line-regexp)
+  (make-local-variable 'adaptive-fill-regexp)
   (setq indent-line-function 'axiom-spad-indent-line)
   (setq completion-at-point-functions '(axiom-spad-complete-symbol))
+  (setq syntax-propertize-function axiom-spad-syntax-propertize-fn)
+  (setq adaptive-fill-first-line-regexp "[[:space:]]*\\(\\+\\+\\|--\\)")
+  (setq adaptive-fill-regexp "[[:space:]]*\\(\\+\\+\\|--\\)")
   (setq axiom-menu-compile-buffer-enable t)
   (setq axiom-menu-compile-file-enable t)
   (setq axiom-menu-read-buffer-enable nil)
