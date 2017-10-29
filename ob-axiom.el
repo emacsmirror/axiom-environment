@@ -71,9 +71,9 @@ specifying a var of the same value."
 (defun org-babel-variable-assignments:axiom (params)
   "Return a list of Axiom statements assigning the block's variables."
   ;;(message "org-babel-variable-assignments:axiom\n %S" params)
-  (let ((vars (mapcan (lambda (param)
-                        (and (eql :var (car param))
-                             (list (cdr param))))
+  (let ((vars (cl-mapcan (lambda (param)
+                           (and (eql :var (car param))
+                                (list (cdr param))))
                       params)))
     (mapcar
      (lambda (pair)
@@ -99,6 +99,8 @@ This function is called by `org-babel-execute-src-block'."
          (beginning-of-line)
          (unless (string-match "^[[:space:]]*$" line)
            (axiom-process-redirect-send-command line (current-buffer) nil t t t t)))
+       (let ((delete-trailing-lines t)) ; dynamic binding
+         (delete-trailing-whitespace))
        (buffer-substring (point-min) (point-max))))))
 
 ;;; Internal helper functions
