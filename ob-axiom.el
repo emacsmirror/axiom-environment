@@ -33,6 +33,11 @@
 
 (require 'axiom-environment)
 
+(defcustom ob-axiom-show-repl-prompt t
+  "Set non-nil to show Axiom REPL prompt in results blocks."
+  :type 'boolean
+  :group 'axiom)
+
 ;; Header arguments
 (defconst org-babel-header-args:axiom '())
 
@@ -48,13 +53,24 @@
 
 (add-to-list 'org-src-lang-modes '("spad" . axiom-spad))
 
+;;; Internal helper functions
+;;;
+(defun org-babel-axiom--starify-name (str)
+  "Ensure valid process buffer name by wrapping with asterisks if necessary."
+  (let ((name str))
+    (unless (eql (aref str 0) ?*)
+      (setq name (concat "*" name)))
+    (unless (eql (aref str (1- (length str))) ?*)
+      (setq name (concat name "*")))
+    name))
+
 ;;; Org framework functions -- functions called by Org-mode
 ;;;
 (defun org-babel-axiom-initiate-session (session params)
   "Start an Axiom session for use by org-babel."
   ;;(message "org-babel-axiom-initiate-session\n %S\n %S" session params)
   (unless (string= session "none")
-    (let ((session-name (org-babel-axiom-starify-name session)))
+    (let ((session-name (org-babel-axiom--starify-name session)))
       (let ((axiom-process-buffer-name session-name)) ; dynamic binding
         (if (org-babel-comint-buffer-livep session-name)
             session-name
@@ -91,26 +107,16 @@ specifying a var of the same value."
   "Execute a block of Axiom code with org-babel.
 This function is called by `org-babel-execute-src-block'."
   ;;(message "org-babel-execute:axiom\n %S\n %S" body params)
-  (let* ((lines (split-string (org-babel-expand-body:axiom body params) "\n"))
-         (session (org-babel-axiom-initiate-session (cdr (assoc :session params)) params)))
-    (let ((axiom-process-buffer-name session))  ; dynamic binding
+  (let ((session (org-babel-axiom-initiate-session (cdr (assoc :session params)) params))
+        (tmp-filename (make-temp-file "axiom" nil ".input")))
+    (with-temp-buffer
+      (insert (org-babel-expand-body:axiom body params))
+      (write-region (point-min) (point-max) tmp-filename))
+    (let ((axiom-process-buffer-name session)) ; dynamic binding
       (with-axiom-process-query-buffer
-       (dolist (line lines)
-         (beginning-of-line)
-         (unless (string-match "^[[:space:]]*$" line)
-           (axiom-process-redirect-send-command line (current-buffer) nil t t t t)))
+       (axiom-process-redirect-send-command
+        (format ")read %s" tmp-filename) (current-buffer) nil nil t nil ob-axiom-show-repl-prompt)
        (buffer-substring (point-min) (point-max))))))
-
-;;; Internal helper functions
-;;;
-(defun org-babel-axiom-starify-name (str)
-  "Ensure valid process buffer name by wrapping with asterisks if necessary."
-  (let ((name str))
-    (unless (eql (aref str 0) ?*)
-      (setq name (concat "*" name)))
-    (unless (eql (aref str (1- (length str))) ?*)
-      (setq name (concat name "*")))
-    name))
 
 (provide 'ob-axiom)
 
