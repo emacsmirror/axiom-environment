@@ -36,12 +36,12 @@
 ;; Header arguments
 (defconst org-babel-header-args:axiom
   '((block-read (no yes))
-    (inhibit-prompt (no yes))))
+    (show-prompt (no yes))))
 
 (defvar org-babel-default-header-args:axiom
   '((:session . "Axiom Org-Babel Session")
     (:block-read . "no")
-    (:inhibit-prompt . "no")))
+    (:show-prompt . "yes")))
 
 ;; File extension for Axiom Input files
 (add-to-list 'org-babel-tangle-lang-exts '("axiom" . "input"))
@@ -106,7 +106,7 @@ specifying a var of the same value."
 (defun org-babel-execute:axiom (body params)
   "Execute a block of Axiom code with org-babel.
 This function is called by `org-babel-execute-src-block'."
-  ;;(message "org-babel-execute:axiom\n %S\n %S" body params)
+  (message "org-babel-execute:axiom\n %S\n %S" body params)
   (let ((session (org-babel-axiom-initiate-session
                   (cdr (assoc :session params)) params))
         (block-read (cdr (assoc :block-read params))))
@@ -115,7 +115,7 @@ This function is called by `org-babel-execute-src-block'."
       (org-babel-axiom--execute-line-by-line session body params))))
 
 (defun org-babel-axiom--execute-by-block-read (session body params)
-  (let ((inhibit-prompt (cdr (assoc :inhibit-prompt params)))
+  (let ((show-prompt (cdr (assoc :show-prompt params)))
         (tmp-filename (make-temp-file "axiom" nil ".input")))
     (with-temp-buffer
       (insert (org-babel-expand-body:axiom body params))
@@ -124,13 +124,13 @@ This function is called by `org-babel-execute-src-block'."
       (with-axiom-process-query-buffer
        (axiom-process-redirect-send-command
         (format ")read %s" tmp-filename) (current-buffer)
-        nil nil t nil (equal inhibit-prompt "no"))
+        nil nil t nil (equal show-prompt "yes"))
        (let ((delete-trailing-lines t)) ; dynamic binding
          (delete-trailing-whitespace))
        (buffer-substring (point-min) (point-max))))))
 
 (defun org-babel-axiom--execute-line-by-line (session body params)
-  (let ((inhibit-prompt (cdr (assoc :inhibit-prompt params)))
+  (let ((show-prompt (cdr (assoc :show-prompt params)))
         (lines (split-string (org-babel-expand-body:axiom body params) "\n"))
         (axiom-process-buffer-name session)) ; dynamic binding
     (with-axiom-process-query-buffer
@@ -138,7 +138,7 @@ This function is called by `org-babel-execute-src-block'."
        (beginning-of-line)
        (unless (string-match "^[[:space:]]*$" line)
          (axiom-process-redirect-send-command
-          line (current-buffer) nil t t t (equal inhibit-prompt "no"))))
+          line (current-buffer) nil t t t (equal show-prompt "yes"))))
      (let ((delete-trailing-lines t))   ; dynamic binding
        (delete-trailing-whitespace))
      (buffer-substring (point-min) (point-max)))))
