@@ -23,6 +23,27 @@
 ;;
 ;; in your ~/.emacs initialisation file.
 
+;; There are two language names defined in this extension: ``axiom''
+;; and ``spad''.  The former is for running arbitrary code in a
+;; running axiom process, but both are also declared as tangle'able
+;; languages.  They correspond to ``axiom-input-mode'' and
+;; ``axiom-spad-mode'' in the axiom-environment system, respectively.
+
+;; There are two extra header options (non-standard org-babel options)
+;; for org-babel ``#+BEGIN_SRC axiom'' source code blocks:-
+;;
+;;   :block-read <yes/no>      (defaults to no)
+;;   :show-prompt <yes/no>     (defaults to yes)
+;;
+;; The block-read option forces ob-axiom to send the entire code block
+;; to the running axiom process via a temporary file.  This allows
+;; ``pile mode'' axiom source code to be handled correctly.  Otherwise
+;; ob-axiom sends each line of the code block individually to the
+;; axiom process for interpretation.
+
+;; The show-prompt option allows to enable or inhibit the display of
+;; the axiom REPL prompt on a block-by-block basis.
+
 ;;; Code:
 (require 'ob)
 (require 'ob-ref)
@@ -106,7 +127,7 @@ specifying a var of the same value."
 (defun org-babel-execute:axiom (body params)
   "Execute a block of Axiom code with org-babel.
 This function is called by `org-babel-execute-src-block'."
-  (message "org-babel-execute:axiom\n %S\n %S" body params)
+  ;;(message "org-babel-execute:axiom\n %S\n %S" body params)
   (let ((session (org-babel-axiom-initiate-session
                   (cdr (assoc :session params)) params))
         (block-read (cdr (assoc :block-read params))))
@@ -139,7 +160,7 @@ This function is called by `org-babel-execute-src-block'."
        (unless (string-match "^[[:space:]]*$" line)
          (axiom-process-redirect-send-command
           line (current-buffer) nil t t t (equal show-prompt "yes"))))
-     (let ((delete-trailing-lines t))   ; dynamic binding
+     (let ((delete-trailing-lines t)) ; dynamic binding
        (delete-trailing-whitespace))
      (buffer-substring (point-min) (point-max)))))
 
