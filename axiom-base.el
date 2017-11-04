@@ -317,6 +317,27 @@ of the space, to the specified indentation level."
       (forward-char left-of-indent))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Common filling routines
+;;
+(defun axiom-fill-paragraph (&optional justify region)
+  (let ((start nil)
+        (end nil))
+    (if region
+        (progn
+          (setq start (region-beginning))
+          (setq end (region-end)))
+      (save-excursion
+        (beginning-of-line)
+        (while (looking-at-p "^[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]*[[:graph:]]+")
+          (forward-line -1))
+        (forward-line)
+        (setq start (point))
+        (while (looking-at-p "^[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]*[[:graph:]]+")
+          (forward-line +1))
+        (setq end (point))))
+    (fill-region-as-paragraph start end justify)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common keymap (including the ``Axiom'' menu)
 ;;
 (defvar axiom-menu-compile-buffer-enable nil)
