@@ -26,8 +26,8 @@
 (defvar axiom-boot-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?_ "\\" table)
-    (modify-syntax-entry ?+ ". 12" table)
-    (modify-syntax-entry ?- ". 12" table)
+    (modify-syntax-entry ?+ "." table)
+    (modify-syntax-entry ?- "." table)
     (modify-syntax-entry ?\n ">" table)
     (modify-syntax-entry ?\t " " table)
     (modify-syntax-entry ?\\ "." table)
@@ -74,11 +74,26 @@
 (defvar axiom-boot-mode-hook nil
   "Hook for customizing Axiom Boot mode.")
 
+(defvar axiom-boot-syntax-propertize-fn
+  (syntax-propertize-rules
+   ("\\(-\\)\\(-\\)"     (1 (string-to-syntax "< 1"))
+                         (2 (string-to-syntax "< 2")))
+   ("\\(\\+\\)\\(\\+\\)" (1 (string-to-syntax "< 1"))
+                         (2 (string-to-syntax "< 2")))))
+
 ;;;###autoload
 (define-derived-mode axiom-boot-mode prog-mode "Axiom Boot"
   "Major mode for Axiom's internal Boot language."
   :group 'axiom
   (setq font-lock-defaults (list axiom-boot-font-lock-keywords))
+  (make-local-variable 'syntax-propertize-function)
+  (make-local-variable 'adaptive-fill-first-line-regexp)
+  (make-local-variable 'adaptive-fill-regexp)
+  (make-local-variable 'fill-paragraph-function)
+  (setq syntax-propertize-function axiom-boot-syntax-propertize-fn)
+  (setq adaptive-fill-first-line-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
+  (setq adaptive-fill-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
+  (setq fill-paragraph-function (function axiom-fill-paragraph))
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable nil)
   (setq axiom-menu-read-buffer-enable nil)
