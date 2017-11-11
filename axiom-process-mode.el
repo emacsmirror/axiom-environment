@@ -503,7 +503,7 @@ buffer, otherwise do not display it."
 (defun axiom-process-document-constructor (name-or-abbrev &optional force-update)
   "Construct a buffer containing documentation for NAME-OR-ABBREV."
   (if (not (get-buffer axiom-process-buffer-name))
-      (message axiom-process-not-running-message)
+      (progn (message axiom-process-not-running-message) nil)
     (unless (equal "" name-or-abbrev)
       (let ((bufname (axiom-process-constructor-buffer-name name-or-abbrev)))
         (when (or (not (get-buffer bufname)) force-update)
@@ -537,10 +537,11 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                       nil 'confirm
                       (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))
                      current-prefix-arg))
-  (let* ((buf (axiom-process-document-constructor name-or-abbrev force-update))
-         (popup (display-buffer buf nil t)))
-    (when (and popup axiom-select-popup-windows)
-      (select-window popup))))
+  (let ((buf (axiom-process-document-constructor name-or-abbrev force-update)))
+    (when buf
+      (let ((popup (display-buffer buf nil t)))
+        (when (and popup axiom-select-popup-windows)
+          (select-window popup))))))
 
 ;;;###autoload
 (defun axiom-process-show-package (name-or-abbrev &optional force-update)
@@ -602,7 +603,7 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
 (defun axiom-process-document-operation (operation-name &optional force-update)
   "Create a buffer containing documentation for OPERATION-NAME."
   (if (not (get-buffer axiom-process-buffer-name))
-      (message axiom-process-not-running-message)
+      (progn (message axiom-process-not-running-message) nil)
     (unless (equal "" operation-name)
       (let ((bufname (format "*Axiom Operation: %s*" operation-name)))
         (when (or (not (get-buffer bufname)) force-update)
@@ -633,10 +634,11 @@ Interactively, FORCE-UPDATE can be set with a prefix argument."
                       "Operation: " axiom-standard-operation-names nil 'confirm
                       (axiom-process-verify-operation-name (thing-at-point 'word)))
                      current-prefix-arg))
-  (let* ((buf (axiom-process-document-operation operation-name force-update))
-         (popup (display-buffer buf nil t)))
-    (when (and popup axiom-select-popup-windows)
-      (select-window popup))))
+  (let ((buf (axiom-process-document-operation operation-name force-update)))
+    (when buf
+      (let ((popup (display-buffer buf nil t)))
+        (when (and popup axiom-select-popup-windows)
+          (select-window popup))))))
 
 ;;;###autoload
 (defun axiom-process-apropos-thing-at-point (name &optional is-constructor)
