@@ -116,14 +116,16 @@
         (axiom-set-current-indent (axiom-find-previous-indent (current-column)))))))
 
 (defun axiom-input-syntax-propertize (start end)
+  ;; Highlight operation names
   (goto-char start)
-  (while (and (< (point) end) (re-search-forward "\\([[:word:]]+\\)" end t))
+  (while (and (< (point) end) (re-search-forward "\\([[:word:]]+\\)\\([[:blank:]]+[[:word:]]\\|[[:blank:]]*(\\)" end t))
     (let ((matched (match-string 1)))
       (when (and matched (> (length matched) 1)
                  (member matched axiom-standard-operation-names))
-        (message "%s" matched)
         (put-text-property (match-beginning 1) (match-end 1)
-                           'font-lock-face axiom-input-operation-face))))
+                           'font-lock-face axiom-input-operation-face)))
+    (goto-char (1- (point))))  ; unswallow word or '(' character
+  ;; Mark comment syntax
   (goto-char start)
   (funcall (syntax-propertize-rules
             ("\\(-\\)\\(-\\)"
