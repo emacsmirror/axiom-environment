@@ -54,6 +54,7 @@
 (defvar axiom-spad-package-face     'axiom-package-name)
 (defvar axiom-spad-domain-face      'axiom-domain-name)
 (defvar axiom-spad-category-face    'axiom-category-name)
+(defvar axiom-spad-operation-face   'axiom-operation-name)
 
 (defvar axiom-spad-font-lock-keywords
   (list (cons axiom-spad-doc-comment-regexp        'axiom-spad-doc-comment-face)
@@ -99,12 +100,24 @@
           (axiom-set-current-indent computed-indent)
         (axiom-set-current-indent (axiom-find-previous-indent (current-column)))))))
 
-(defvar axiom-spad-syntax-propertize-fn
-  (syntax-propertize-rules
-   ("\\(-\\)\\(-\\)"     (1 (string-to-syntax "< 1"))
-                         (2 (string-to-syntax "< 2")))
-   ("\\(\\+\\)\\(\\+\\)" (1 (string-to-syntax "< 1"))
-                         (2 (string-to-syntax "< 2")))))
+(defun axiom-spad-syntax-propertize (start end)
+  (goto-char start)
+  (while (and (< (point) end) (re-search-forward "\\([[:word:]]+\\)" end t))
+    (let ((matched (match-string 1)))
+      (when (and matched (> (length matched) 1)
+                 (member matched axiom-standard-operation-names))
+        (message "%s" matched)
+        (put-text-property (match-beginning 1) (match-end 1)
+                           'font-lock-face axiom-spad-operation-face))))
+  (goto-char start)
+  (funcall (syntax-propertize-rules
+            ("\\(-\\)\\(-\\)"
+             (1 (string-to-syntax "< 1"))
+             (2 (string-to-syntax "< 2")))
+            ("\\(\\+\\)\\(\\+\\)"
+             (1 (string-to-syntax "< 1"))
+             (2 (string-to-syntax "< 2"))))
+           start end))
 
 ;;;###autoload
 (define-derived-mode axiom-spad-mode prog-mode "Axiom SPAD"
@@ -120,7 +133,7 @@
   (make-local-variable 'fill-paragraph-function)
   (setq indent-line-function 'axiom-spad-indent-line)
   (setq completion-at-point-functions '(axiom-spad-complete-symbol))
-  (setq syntax-propertize-function axiom-spad-syntax-propertize-fn)
+  (setq syntax-propertize-function (function axiom-spad-syntax-propertize))
   (setq adaptive-fill-first-line-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
   (setq adaptive-fill-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
   (setq fill-paragraph-function (function axiom-fill-paragraph))
