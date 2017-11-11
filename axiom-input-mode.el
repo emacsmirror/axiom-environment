@@ -117,6 +117,7 @@
 
 (defun axiom-input-syntax-propertize (start end)
   ;; Highlight operation names
+  (remove-text-properties start end '(font-lock-face nil))
   (goto-char start)
   (while (and (< (point) end) (re-search-forward "\\([[:word:]]+\\)\\([[:blank:]]+[[:word:]]\\|[[:blank:]]*(\\)" end t))
     (let ((matched (match-string 1)))
