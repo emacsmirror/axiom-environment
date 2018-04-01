@@ -234,6 +234,7 @@
  ("TSETCAT" . "TriangularSetCategory")
  ("TRIGCAT" . "TrigonometricFunctionCategory")
  ("ARR2CAT" . "TwoDimensionalArrayCategory")
+ ("ATTWSR" . "TwoSidedRecip")
  ("TYPE" . "Type")
  ("URAGG" . "UnaryRecursiveAggregate")
  ("UFD" . "UniqueFactorizationDomain")
