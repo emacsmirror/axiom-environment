@@ -1,6 +1,6 @@
 ;;; axiom-build-utils.el --- Utilities to help build the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2017 Paul Onions
+;; Copyright (C) 2013 - 2018 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -19,7 +19,7 @@
 
 ;;; Code:
 
-(require 'package-build)
+(require 'subr-x)
 (require 'package-x)
 
 (require 'axiom-base)
@@ -132,28 +132,51 @@ TYPE should be either :package, :domain or :category."
   (mapcar 'string-to-number (split-string str "\\.")))
 
 (defvar axiom-build-axiom-environment-filespecs
-  '("*.el" ("data" "data/*.el") ("themes" "themes/*.el")
+  '("LICENCE" "*.el" ("data" "data/*.el") ("themes" "themes/*.el")
     (:exclude "axiom.el" "axiom-build-utils.el"
               "ob-axiom.el" "company-axiom.el")))
 
 (defvar axiom-build-ob-axiom-filespecs
-  '("ob-axiom.el"))
+  '("LICENCE" "ob-axiom.el"))
 
 (defvar axiom-build-company-axiom-filespecs
-  '("company-axiom.el"))
+  '("LICENCE" "company-axiom.el"))
+
+(defun axiom-build-emacs-package-dir (pkg-filespecs src-dir dst-dir)
+  (let ((default-directory src-dir))
+    (dolist (filespec pkg-filespecs)
+      (cond ((stringp filespec)
+             (dolist (file (file-expand-wildcards filespec))
+               (copy-file file dst-dir t)))
+            ((and (listp filespec) (stringp (car filespec)))
+             (let ((sub-dir (concat dst-dir (car filespec) "/")))
+               (make-directory sub-dir)
+               (dolist (spec (cdr filespec))
+                 (dolist (file (file-expand-wildcards spec))
+                   (copy-file file sub-dir t)))))
+            ((and (listp filespec) (eql (car filespec) :exclude))
+             (dolist (file (cdr filespec))
+               (delete-file (concat dst-dir file))))))))
+
+(defun axiom-build-emacs-package-tarfile (pkg-name pkg-ver pkg-filespecs src-dir)
+  (let* ((tar-name (concat pkg-name "-" pkg-ver))
+         (tar-dir  (concat src-dir tar-name "/"))
+         (tar-file (concat src-dir tar-name ".tar")))
+    (make-directory tar-dir)
+    (axiom-build-emacs-package-dir pkg-filespecs src-dir tar-dir)
+    (let* ((default-directory src-dir)
+           (command (concat "tar cvf " tar-file " " tar-name)))
+      (call-process-shell-command command nil "*Axiom Build Emacs Package*" t)
+      tar-file)))
 
 (defun axiom-build-emacs-package (src-dir arc-dir pkg-filespecs pkg-name pkg-ver)
   (unless (and src-dir (file-accessible-directory-p src-dir))
     (error "Cannot find source directory: %s" src-dir))
   (unless (and arc-dir (file-accessible-directory-p arc-dir))
     (error "Cannot find archive directory: %s" arc-dir))
-  (package-build-package pkg-name pkg-ver pkg-filespecs src-dir temporary-file-directory)
-  (let* ((package-archive-upload-base arc-dir)
-         (pkg-basename (concat temporary-file-directory pkg-name "-" pkg-ver))
-         (pkg-filename (if (file-readable-p (concat pkg-basename ".el"))
-                           (concat pkg-basename ".el")
-                         (concat pkg-basename ".tar"))))
-    (package-upload-file pkg-filename)))
+  (let ((tarfile (axiom-build-emacs-package-tarfile pkg-name pkg-ver pkg-filespecs src-dir))
+        (package-archive-upload-base arc-dir))
+    (package-upload-file tarfile)))
 
 (defun axiom-build-interactive-args ()
   (list (read-directory-name "Project source directory: " axiom-build-source-dir)
@@ -167,9 +190,16 @@ Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
   (interactive (axiom-build-interactive-args))
-  (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
-                             axiom-build-axiom-environment-filespecs
-                             "axiom-environment" pkg-ver))
+  (let* ((pkg-name "axiom-environment")
+         (pkg-defn `(define-package ,pkg-name ,pkg-ver
+                      "An environment for working with the Axiom, OpenAxiom and FriCAS computer algebra systems."
+                      nil))
+         (pkg-filespecs (cons (concat pkg-name "-pkg.el")
+                              axiom-build-axiom-environment-filespecs))
+         (default-directory src-dir))
+    (write-region (format "%S" pkg-defn) nil (concat pkg-name "-pkg.el"))
+    (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
+                               pkg-filespecs pkg-name pkg-ver)))
 
 (defun axiom-build-ob-axiom-package (src-dir archive pkg-ver)
   "Build and upload the ob-axiom Emacs package.
@@ -178,9 +208,16 @@ Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
   (interactive (axiom-build-interactive-args))
-  (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
-                             axiom-build-ob-axiom-filespecs
-                             "ob-axiom" pkg-ver))
+  (let* ((pkg-name "ob-axiom")
+         (pkg-defn `(define-package ,pkg-name ,pkg-ver
+                      "An Axiom backend for org-babel."
+                      ((axiom-environment ,pkg-ver))))
+         (pkg-filespecs (cons (concat pkg-name "-pkg.el")
+                              axiom-build-ob-axiom-filespecs))
+         (default-directory src-dir))
+    (write-region (format "%S" pkg-defn) nil (concat pkg-name "-pkg.el"))
+    (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
+                               pkg-filespecs pkg-name pkg-ver)))
 
 (defun axiom-build-company-axiom-package (src-dir archive pkg-ver)
   "Build and upload the company-axiom Emacs package.
@@ -189,9 +226,16 @@ Specifying project source directory, package archive name and
 package version string.  The package archive name should be one
 of those specified in the `package-archives' variable."
   (interactive (axiom-build-interactive-args))
-  (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
-                             axiom-build-company-axiom-filespecs
-                             "company-axiom" pkg-ver))
+  (let* ((pkg-name "company-axiom")
+         (pkg-defn `(define-package ,pkg-name ,pkg-ver
+                      "An Axiom backend for company-mode."
+                      ((axiom-environment ,pkg-ver))))
+         (pkg-filespecs (cons (concat pkg-name "-pkg.el")
+                              axiom-build-company-axiom-filespecs))
+         (default-directory src-dir))
+    (write-region (format "%S" pkg-defn) nil (concat pkg-name "-pkg.el"))
+    (axiom-build-emacs-package src-dir (cdr (assoc archive package-archives))
+                               pkg-filespecs pkg-name pkg-ver)))
 
 (defun axiom-build-all-emacs-packages (src-dir archive pkg-ver)
   "Build and upload all axiom-environment project packages.
@@ -235,12 +279,12 @@ generated packages will have the same version number."
         (updated-ob-axiom-pkg
          (package-desc-create :name 'ob-axiom
                               :version (axiom-build-parse-version-string pkg-ver)
-                              :kind 'single
+                              :kind 'tar
                               :archive archive))
         (updated-company-axiom-pkg
          (package-desc-create :name 'company-axiom
                               :version (axiom-build-parse-version-string pkg-ver)
-                              :kind 'single
+                              :kind 'tar
                               :archive archive)))
     (message "Removing installed packages")
     (when installed-ob-axiom-pkg
