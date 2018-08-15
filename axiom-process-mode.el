@@ -245,8 +245,9 @@ don't display the default-directory in a message."
   "Evaluate the given string in the Axiom process."
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
-    (progn
-      (display-buffer axiom-process-buffer-name nil t)
+    (let ((win (display-buffer axiom-process-buffer-name nil t)))
+      (when axiom-select-popup-windows
+        (select-window win))
       (axiom-process-insert-command str))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,11 +265,12 @@ don't display the default-directory in a message."
   (interactive "r")
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
-    (progn
-      (display-buffer axiom-process-buffer-name nil t)
-      (let ((tmp-filename (make-temp-file "axiom" nil ".input")))
-        (write-region start end tmp-filename)
-        (axiom-process-insert-command (format ")read %s" tmp-filename))))))
+    (let ((tmp-filename (make-temp-file "axiom" nil ".input")))
+      (write-region start end tmp-filename)
+      (let ((win (display-buffer axiom-process-buffer-name nil t)))
+        (when axiom-select-popup-windows
+          (select-window win)))
+      (axiom-process-insert-command (format ")read %s" tmp-filename)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reading and compiling files
@@ -284,7 +286,9 @@ If NO-DISPLAY is nil then also display the Axiom process buffer."
       (message axiom-process-not-running-message)
     (progn
       (unless no-display
-        (display-buffer axiom-process-buffer-name nil t))
+        (let ((win (display-buffer axiom-process-buffer-name nil t)))
+          (when axiom-select-popup-windows
+            (select-window win))))
       (axiom-process-insert-command (format ")read %s" (expand-file-name filename))))))
 
 ;;;###autoload
