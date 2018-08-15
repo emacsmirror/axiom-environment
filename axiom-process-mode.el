@@ -241,35 +241,37 @@ don't display the default-directory in a message."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evaluating a string
 ;;
-(defun axiom-process-eval-string (str)
+(defun axiom-process-eval-string (str &optional no-display)
   "Evaluate the given string in the Axiom process."
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
-    (let ((win (display-buffer axiom-process-buffer-name nil t)))
-      (when axiom-select-popup-windows
-        (select-window win))
-      (axiom-process-insert-command str))))
+    (unless no-display
+      (let ((win (display-buffer axiom-process-buffer-name nil t)))
+        (when axiom-select-popup-windows
+          (select-window win))))
+    (axiom-process-insert-command str)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evaluating a region
 ;;
 ;;;###autoload
-(defun axiom-process-eval-region (start end)
+(defun axiom-process-eval-region (start end &optional no-display)
   "Evaluate the given region in the Axiom process."
-  (interactive "r")
-  (axiom-process-eval-string (buffer-substring-no-properties start end)))
+  (interactive "r\nP")
+  (axiom-process-eval-string (buffer-substring-no-properties start end no-display)))
 
 ;;;###autoload
-(defun axiom-process-read-region (start end)
+(defun axiom-process-read-region (start end &optional no-display)
   "Copy region into a temporary file and )read it."
-  (interactive "r")
+  (interactive "r\nP")
   (if (null (get-buffer axiom-process-buffer-name))
       (message axiom-process-not-running-message)
     (let ((tmp-filename (make-temp-file "axiom" nil ".input")))
       (write-region start end tmp-filename)
-      (let ((win (display-buffer axiom-process-buffer-name nil t)))
-        (when axiom-select-popup-windows
-          (select-window win)))
+      (unless no-display
+        (let ((win (display-buffer axiom-process-buffer-name nil t)))
+          (when axiom-select-popup-windows
+            (select-window win))))
       (axiom-process-insert-command (format ")read %s" tmp-filename)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
