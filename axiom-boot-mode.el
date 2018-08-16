@@ -98,8 +98,7 @@
   (setq axiom-menu-compile-file-enable nil)
   (setq axiom-menu-read-buffer-enable nil)
   (setq axiom-menu-read-file-enable nil)
-  (setq axiom-menu-read-region-enable nil)
-  (setq axiom-menu-eval-region-enable nil))
+  (setq axiom-menu-read-region-enable nil))
 
 (provide 'axiom-boot-mode)
 

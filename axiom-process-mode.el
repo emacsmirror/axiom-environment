@@ -1,6 +1,6 @@
 ;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2017 Paul Onions
+;; Copyright (C) 2013 - 2018 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -822,7 +822,6 @@ variable `axiom-process-webview-url'."
   (setq axiom-menu-read-buffer-enable nil)
   (setq axiom-menu-read-file-enable t)
   (setq axiom-menu-read-region-enable t)
-  (setq axiom-menu-eval-region-enable t)
   (let ((schedule-cd-update nil)
         (process-buffer (current-buffer)))
     (add-hook 'comint-input-filter-functions

@@ -1,6 +1,6 @@
 ;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2017 Paul Onions
+;; Copyright (C) 2013 - 2018 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -346,7 +346,6 @@ of the space, to the specified indentation level."
 (defvar axiom-menu-read-buffer-enable nil)
 (defvar axiom-menu-read-file-enable   nil)
 (defvar axiom-menu-read-region-enable nil)
-(defvar axiom-menu-eval-region-enable nil)
 
 (make-variable-buffer-local 'axiom-menu-compile-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-compile-file-enable)
@@ -354,7 +353,6 @@ of the space, to the specified indentation level."
 (make-variable-buffer-local 'axiom-menu-read-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-read-file-enable)
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
-(make-variable-buffer-local 'axiom-menu-eval-region-enable)
 
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
@@ -381,9 +379,6 @@ of the space, to the specified indentation level."
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
-    (define-key menu-map [axiom-menu-eval-region]
-      '(menu-item "Eval Region" axiom-process-eval-region
-                  :enable axiom-menu-eval-region-enable))
     (define-key menu-map [axiom-menu-read-region]
       '(menu-item "Read Region" axiom-process-read-region
                   :enable axiom-menu-read-region-enable))

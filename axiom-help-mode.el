@@ -51,8 +51,7 @@
   (setq axiom-menu-compile-file-enable nil)
   (setq axiom-menu-read-buffer-enable nil)
   (setq axiom-menu-read-file-enable nil)
-  (setq axiom-menu-read-region-enable t)
-  (setq axiom-menu-eval-region-enable t))
+  (setq axiom-menu-read-region-enable t))
 
 (provide 'axiom-help-mode)
 
