@@ -343,9 +343,10 @@ of the space, to the specified indentation level."
 (defvar axiom-menu-compile-buffer-enable nil)
 (defvar axiom-menu-compile-file-enable   nil)
 
-(defvar axiom-menu-read-buffer-enable nil)
-(defvar axiom-menu-read-file-enable   nil)
-(defvar axiom-menu-read-region-enable nil)
+(defvar axiom-menu-read-buffer-enable   nil)
+(defvar axiom-menu-read-file-enable     nil)
+(defvar axiom-menu-read-region-enable   nil)
+(defvar axiom-menu-read-toplevel-enable nil)
 
 (make-variable-buffer-local 'axiom-menu-compile-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-compile-file-enable)
@@ -353,6 +354,7 @@ of the space, to the specified indentation level."
 (make-variable-buffer-local 'axiom-menu-read-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-read-file-enable)
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
+(make-variable-buffer-local 'axiom-menu-read-toplevel-enable)
 
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
@@ -372,6 +374,7 @@ of the space, to the specified indentation level."
     (define-key map (kbd "C-c C-b r") 'axiom-process-read-buffer)
     (define-key map (kbd "C-c C-r")   'axiom-process-read-file)
     (define-key map (kbd "C-c C-y")   'axiom-process-read-region)
+    (define-key map (kbd "C-c C-c")   'axiom-process-read-toplevel)
     (define-key map (kbd "C-c C-e")   'axiom-process-eval-region)
     ;; Menu items
     (define-key map [menu-bar axiom-menu] (cons "Axiom" menu-map))
@@ -379,6 +382,9 @@ of the space, to the specified indentation level."
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
+    (define-key menu-map [axiom-menu-read-toplevel]
+      '(menu-item "Read Toplevel" axiom-process-read-toplevel
+                  :enable axiom-menu-read-toplevel-enable))
     (define-key menu-map [axiom-menu-read-region]
       '(menu-item "Read Region" axiom-process-read-region
                   :enable axiom-menu-read-region-enable))
@@ -386,7 +392,7 @@ of the space, to the specified indentation level."
       '(menu-item "Read File..." axiom-process-read-file
                   :enable axiom-menu-read-file-enable))
     (define-key menu-map [axiom-menu-read-buffer]
-      '(menu-item "Read Buffer..." axiom-process-read-buffer
+      '(menu-item "Read Buffer" axiom-process-read-buffer
                   :enable axiom-menu-read-buffer-enable))
     (define-key menu-map [axiom-menu-separator-2]
       '(menu-item "--"))
@@ -471,6 +477,11 @@ continuation-lines (underscores escape new lines)."
           (setq line (concat line (buffer-substring-no-properties beg end-excl-underscore))))
         (setq beg (1+ end)))
       line)))
+
+(defun axiom-flash-region (start end)
+  (let ((ovl (make-overlay start end)))
+    (overlay-put ovl 'face 'secondary-selection)
+    (run-with-timer 0.5 nil 'delete-overlay ovl)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Developer utils

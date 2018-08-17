@@ -274,6 +274,26 @@ don't display the default-directory in a message."
             (select-window win))))
       (axiom-process-insert-command (format ")read %s" tmp-filename)))))
 
+(defun axiom-process-read-toplevel (&optional no-display)
+  (interactive "P")
+  (let ((start (point))
+        (end (point)))
+    (save-excursion
+      (beginning-of-line)
+      (while (and (not (eql (point) (point-min)))
+                  (member (char-after) (list 9 10 12 13 32)))
+        (forward-line -1))
+      (setq start (point)))
+    (save-excursion
+      (beginning-of-line)
+      (forward-line +1)
+      (while (and (not (eql (point) (point-max)))
+                  (member (char-after) (list 9 10 12 13 32)))
+        (forward-line +1))
+      (setq end (point)))
+    (axiom-flash-region start end)
+    (axiom-process-read-region start end no-display)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reading and compiling files
 ;;
@@ -822,6 +842,7 @@ variable `axiom-process-webview-url'."
   (setq axiom-menu-read-buffer-enable nil)
   (setq axiom-menu-read-file-enable t)
   (setq axiom-menu-read-region-enable t)
+  (setq axiom-menu-read-toplevel-enable nil)
   (let ((schedule-cd-update nil)
         (process-buffer (current-buffer)))
     (add-hook 'comint-input-filter-functions
