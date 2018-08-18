@@ -346,7 +346,7 @@ of the space, to the specified indentation level."
 (defvar axiom-menu-read-buffer-enable   nil)
 (defvar axiom-menu-read-file-enable     nil)
 (defvar axiom-menu-read-region-enable   nil)
-(defvar axiom-menu-read-toplevel-enable nil)
+(defvar axiom-menu-read-pile-enable nil)
 
 (make-variable-buffer-local 'axiom-menu-compile-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-compile-file-enable)
@@ -354,7 +354,7 @@ of the space, to the specified indentation level."
 (make-variable-buffer-local 'axiom-menu-read-buffer-enable)
 (make-variable-buffer-local 'axiom-menu-read-file-enable)
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
-(make-variable-buffer-local 'axiom-menu-read-toplevel-enable)
+(make-variable-buffer-local 'axiom-menu-read-pile-enable)
 
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
@@ -374,7 +374,7 @@ of the space, to the specified indentation level."
     (define-key map (kbd "C-c C-b r") 'axiom-process-read-buffer)
     (define-key map (kbd "C-c C-r")   'axiom-process-read-file)
     (define-key map (kbd "C-c C-y")   'axiom-process-read-region)
-    (define-key map (kbd "C-c C-c")   'axiom-process-read-toplevel)
+    (define-key map (kbd "C-c C-c")   'axiom-process-read-pile)
     (define-key map (kbd "C-c C-e")   'axiom-process-eval-region)
     ;; Menu items
     (define-key map [menu-bar axiom-menu] (cons "Axiom" menu-map))
@@ -382,26 +382,26 @@ of the space, to the specified indentation level."
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
-    (define-key menu-map [axiom-menu-read-toplevel]
-      '(menu-item "Read Toplevel" axiom-process-read-toplevel
-                  :enable axiom-menu-read-toplevel-enable))
+    (define-key menu-map [axiom-menu-read-pile]
+      '(menu-item "Read Pile" axiom-process-read-pile
+                  :enable axiom-menu-read-pile-enable))
     (define-key menu-map [axiom-menu-read-region]
       '(menu-item "Read Region" axiom-process-read-region
                   :enable axiom-menu-read-region-enable))
-    (define-key menu-map [axiom-menu-read-file]
-      '(menu-item "Read File..." axiom-process-read-file
-                  :enable axiom-menu-read-file-enable))
     (define-key menu-map [axiom-menu-read-buffer]
       '(menu-item "Read Buffer" axiom-process-read-buffer
                   :enable axiom-menu-read-buffer-enable))
+    (define-key menu-map [axiom-menu-read-file]
+      '(menu-item "Read File..." axiom-process-read-file
+                  :enable axiom-menu-read-file-enable))
     (define-key menu-map [axiom-menu-separator-2]
       '(menu-item "--"))
-    (define-key menu-map [axiom-menu-compile-file]
-      '(menu-item "Compile File..." axiom-process-compile-file
-                  :enable axiom-menu-compile-file-enable))
     (define-key menu-map [axiom-menu-compile-buffer]
       '(menu-item "Compile Buffer" axiom-process-compile-buffer
                   :enable axiom-menu-compile-buffer-enable))
+    (define-key menu-map [axiom-menu-compile-file]
+      '(menu-item "Compile File..." axiom-process-compile-file
+                  :enable axiom-menu-compile-file-enable))
     (define-key menu-map [axiom-menu-separator-1]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-webview-constructor]
