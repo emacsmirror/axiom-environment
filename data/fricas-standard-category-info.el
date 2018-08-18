@@ -92,7 +92,6 @@
  ("FRAMALG" . "FramedAlgebra")
  ("FRMOD" . "FramedModule")
  ("FRNAALG" . "FramedNonAssociativeAlgebra")
- ("FAMONC" . "FreeAbelianMonoidCategory")
  ("FLALG" . "FreeLieAlgebra")
  ("FMCAT" . "FreeModuleCategory")
  ("FEVALAB" . "FullyEvalableOver")
