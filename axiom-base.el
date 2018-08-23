@@ -356,6 +356,10 @@ of the space, to the specified indentation level."
 (make-variable-buffer-local 'axiom-menu-read-region-enable)
 (make-variable-buffer-local 'axiom-menu-read-pile-enable)
 
+(defun axiom-edit-customization-group ()
+  (interactive)
+  (customize-group 'axiom))
+
 (defvar axiom-common-keymap
   (let ((map (make-sparse-keymap "Axiom"))
         (menu-map (make-sparse-keymap "Axiom")))
@@ -380,6 +384,10 @@ of the space, to the specified indentation level."
     (define-key map [menu-bar axiom-menu] (cons "Axiom" menu-map))
     (define-key menu-map [axiom-menu-run-axiom]
       '(menu-item "Run Axiom" run-axiom))
+    (define-key menu-map [axiom-menu-separator-4]
+      '(menu-item "--"))
+    (define-key menu-map [axiom-menu-edit-customization-group]
+      '(menu-item "Emacs Customizations" axiom-edit-customization-group))
     (define-key menu-map [axiom-menu-separator-3]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-read-pile]
