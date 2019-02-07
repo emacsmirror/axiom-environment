@@ -229,6 +229,7 @@
                (setq axiom-buffer-menu-startpoint-help (point)))))
       (dolist (buffer (buffer-list))
         (let (this-buffer-read-only
+              this-buffer-hidden
               this-buffer-name
               this-buffer-mode
               this-buffer-filename
@@ -238,10 +239,12 @@
             (setq this-buffer-read-only buffer-read-only
                   this-buffer-name (buffer-name)
                   this-buffer-mode major-mode
-                  this-buffer-filename (buffer-file-name)))
-          (when (or (and (eql show-type :input) (eql this-buffer-mode 'axiom-input-mode))
-                    (and (eql show-type :spad) (eql this-buffer-mode 'axiom-spad-mode))
-                    (and (eql show-type :help) (eql this-buffer-mode 'axiom-help-mode)))
+                  this-buffer-filename (buffer-file-name))
+            (setq this-buffer-hidden (eql (elt this-buffer-name 0) ?\s)))
+          (when (and (or (and (eql show-type :input) (eql this-buffer-mode 'axiom-input-mode))
+                         (and (eql show-type :spad) (eql this-buffer-mode 'axiom-spad-mode))
+                         (and (eql show-type :help) (eql this-buffer-mode 'axiom-help-mode)))
+                     (not this-buffer-hidden))
             (indent-to axiom-buffer-menu-startcolumn-bufprop)
             (princ (if (buffer-modified-p buffer) "*" " "))
             (princ (if this-buffer-read-only "%" " "))
