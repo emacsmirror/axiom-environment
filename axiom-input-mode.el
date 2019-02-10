@@ -17,6 +17,7 @@
 (require 'axiom-base)
 (require 'axiom-help-mode)
 (require 'axiom-process-mode)
+(require 'imenu)
 
 (defface axiom-input-doc-comment '((t :inherit font-lock-doc-face))
   "Face used for displaying input documentation comments."
@@ -47,6 +48,12 @@
 (defvar axiom-input-keywords-regexp
   (concat "\\<" (regexp-opt axiom-input-keyword-names) "\\>")
   "Regular expression for input file keywords.")
+
+(defvar axiom-input-imenu-generic-expression
+  '(("Variable" "^\\([[:word:]]+\\).+:=" 1)
+    ("Function" "^\\([[:word:]]+\\).+==\\([^>]\\|$\\)" 1)
+    ("Macro" "^\\([[:word:]]+\\).+==>" 1))
+  "Setting for `imenu-generic-expression' in Axiom input mode.")
 
 (defvar axiom-input-doc-comment-face 'axiom-input-doc-comment)
 (defvar axiom-input-keyword-face     'axiom-input-keyword)
@@ -155,6 +162,7 @@
   (setq adaptive-fill-first-line-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
   (setq adaptive-fill-regexp "[[:blank:]]*\\(\\+\\+\\|--\\)[[:blank:]]?")
   (setq fill-paragraph-function (function axiom-fill-paragraph))
+  (setq imenu-generic-expression axiom-input-imenu-generic-expression)
   (setq axiom-menu-compile-buffer-enable nil)
   (setq axiom-menu-compile-file-enable nil)
   (setq axiom-menu-read-buffer-enable t)
