@@ -834,6 +834,8 @@ variable `axiom-process-webview-url'."
   (setq electric-indent-inhibit t)
   (make-local-variable 'indent-line-function)
   (make-local-variable 'completion-at-point-functions)
+  (make-local-variable 'comint-input-filter-functions)
+  (make-local-variable 'comint-output-filter-functions)
   (setq indent-line-function 'axiom-process-indent-line)
   (setq completion-at-point-functions '(axiom-process-complete-command-line
                                         axiom-process-complete-symbol))
