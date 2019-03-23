@@ -1,6 +1,6 @@
 ;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2018 Paul Onions
+;; Copyright (C) 2013 - 2019 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -24,6 +24,11 @@
 
 (defcustom axiom-select-popup-windows t
   "Set non-nil to automatically switch to popup windows."
+  :type 'boolean
+  :group 'axiom)
+
+(defcustom axiom-select-displayed-repl nil
+  "Set non-nil to automatically switch to displayed REPL buffer."
   :type 'boolean
   :group 'axiom)
 

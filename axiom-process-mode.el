@@ -1,6 +1,6 @@
 ;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2018 Paul Onions
+;; Copyright (C) 2013 - 2019 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -247,7 +247,7 @@ don't display the default-directory in a message."
       (message axiom-process-not-running-message)
     (unless no-display
       (let ((win (display-buffer axiom-process-buffer-name nil t)))
-        (when axiom-select-popup-windows
+        (when axiom-select-displayed-repl
           (select-window win))))
     (axiom-process-insert-command str)))
 
@@ -270,7 +270,7 @@ don't display the default-directory in a message."
       (write-region start end tmp-filename)
       (unless no-display
         (let ((win (display-buffer axiom-process-buffer-name nil t)))
-          (when axiom-select-popup-windows
+          (when axiom-select-displayed-repl
             (select-window win))))
       (axiom-process-insert-command (format ")read %s" tmp-filename)))))
 
@@ -309,7 +309,7 @@ If NO-DISPLAY is nil then also display the Axiom process buffer."
     (progn
       (unless no-display
         (let ((win (display-buffer axiom-process-buffer-name nil t)))
-          (when axiom-select-popup-windows
+          (when axiom-select-displayed-repl
             (select-window win))))
       (axiom-process-insert-command (format ")read %s" (expand-file-name filename))))))
 
@@ -354,7 +354,7 @@ buffer, otherwise do not display it."
           (axiom-process-redirect-send-command (format ")cd %s" current-dir) (current-buffer) (not no-display))
           (set-buffer-modified-p nil)
           (setq buffer-read-only t))))
-      (when (and axiom-select-popup-windows (not no-display))
+      (when (and axiom-select-displayed-repl (not no-display))
         (select-window (display-buffer axiom-process-compile-file-buffer-name nil t)))))
 
 ;;;###autoload
