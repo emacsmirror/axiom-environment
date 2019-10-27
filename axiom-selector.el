@@ -1,6 +1,6 @@
 ;;; axiom-selector.el --- A buffer selector utility for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2017 Paul Onions
+;; Copyright (C) 2013 - 2019 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -15,6 +15,8 @@
 ;; Inspired by (and code borrowed from) the Slime selector function.
 
 ;;; Code:
+
+(require 'cl-lib)
 
 (defcustom axiom-selector-help-buffer-name "*Axiom Selector Help*"
   "Axiom selector help buffer name."
@@ -49,7 +51,7 @@ functions."
            (discard-input)
            (axiom-selector))
           (t
-           (funcall (third selector-entry))))))
+           (funcall (cl-third selector-entry))))))
 
 (defmacro define-axiom-selector-function (key description &rest body)
   "Define a new `axiom-selector' function.
@@ -70,7 +72,7 @@ is chosen."
   (with-current-buffer (get-buffer-create axiom-selector-help-buffer-name)
     (insert "Selector Methods:\n\n")
     (dolist (entry axiom-selector-functions)
-      (insert (format "%c:\t%s\n" (first entry) (second entry))))
+      (insert (format "%c:\t%s\n" (cl-first entry) (cl-second entry))))
     (help-mode)
     (display-buffer (current-buffer) nil t)
     (shrink-window-if-larger-than-buffer 
@@ -95,7 +97,7 @@ is chosen."
         (buf nil))
     (while (and bufs (null buf))
       (save-excursion
-        (with-current-buffer (first bufs)
+        (with-current-buffer (cl-first bufs)
           (when (eql major-mode mode)
             (setq buf (current-buffer)))))
       (setq bufs (rest bufs)))

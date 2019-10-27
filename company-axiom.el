@@ -1,6 +1,6 @@
 ;;; company-axiom.el --- A company-mode backend for the axiom-environment system -*- lexical-binding: t -*-
 
-;; Copyright (C) 2016 - 2017 Paul Onions
+;; Copyright (C) 2016 - 2019 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS, axiom-environment
@@ -54,7 +54,7 @@ See company documentation for COMMAND, ARG and IGNORED syntax."
     (location
      (when (axiom-process-verify-constructor-name-or-abbrev arg)
        (let ((src-info (axiom-process-find-constructor-source arg)))
-         (cons (first src-info) (second src-info)))))))
+         (cons (cl-first src-info) (cl-second src-info)))))))
 
 ;;;###autoload
 (eval-after-load 'company

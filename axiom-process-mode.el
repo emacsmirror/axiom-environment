@@ -14,6 +14,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'axiom-base)
 (require 'axiom-help-mode)
 (require 'comint)
@@ -716,10 +717,10 @@ variable `axiom-process-webview-url'."
                       (axiom-process-verify-constructor-name-or-abbrev (thing-at-point 'word)))))
   (let ((location (axiom-process-find-constructor-source name-or-abbrev)))
     (if location
-	(let ((buf (find-file (first location))))
+	(let ((buf (find-file (cl-first location))))
 	  (switch-to-buffer buf)
           (goto-char (point-min))
-          (forward-line (second location)))
+          (forward-line (cl-second location)))
       (message "Source not found"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
