@@ -95,6 +95,7 @@ file."
 (defvar axiom-process-mode-map
   (let ((map (copy-keymap axiom-common-keymap)))
     (set-keymap-parent map comint-mode-map)
+    (define-key map (kbd "C-c C-c") 'comint-interrupt-subjob)
     map)
   "Keymap for `axiom-process-mode'.")
 
