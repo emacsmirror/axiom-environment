@@ -307,7 +307,6 @@
  ("SCIFS" . "SceneIFS")
  ("SCNP" . "SceneNamedPoints")
  ("SCENE" . "Scene")
- ("FORMULA" . "ScriptFormulaFormat")
  ("SEGBIND" . "SegmentBinding")
  ("SEG" . "Segment")
  ("SEQU" . "Sequence")
