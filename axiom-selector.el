@@ -1,6 +1,6 @@
 ;;; axiom-selector.el --- A buffer selector utility for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2019 Paul Onions
+;; Copyright (C) 2013 - 2020 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -100,7 +100,7 @@ is chosen."
         (with-current-buffer (cl-first bufs)
           (when (eql major-mode mode)
             (setq buf (current-buffer)))))
-      (setq bufs (rest bufs)))
+      (setq bufs (cl-rest bufs)))
     buf))
 
 (define-axiom-selector-function ?i "Switch to most recent Axiom Input buffer"
