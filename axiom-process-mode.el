@@ -260,7 +260,7 @@ don't display the default-directory in a message."
 (defun axiom-process-eval-region (start end &optional no-display)
   "Evaluate the given region in the Axiom process."
   (interactive "r\nP")
-  (axiom-process-eval-string (buffer-substring-no-properties start end no-display)))
+  (axiom-process-eval-string (buffer-substring-no-properties start end) no-display))
 
 ;;;###autoload
 (defun axiom-process-read-region (start end &optional no-display)
