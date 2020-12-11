@@ -85,6 +85,14 @@ file."
   :type 'list
   :group 'axiom)
 
+(defcustom axiom-process-enable-pretty-print nil
+  "Enable pretty printing of axiom output.
+You need `mml2svg' binary inside your PATH to use it.
+You can install it with command:
+sudo npm install --global mathjax-node-cli"
+  :type 'boolean
+  :group 'axiom)
+
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
 
@@ -861,7 +869,8 @@ variable `axiom-process-webview-url'."
                            schedule-cd-update)
                   (setq schedule-cd-update nil)
                   (let ((axiom-process-buffer-name process-buffer))  ; dynamic binding
-                    (axiom-process-force-cd-update)))))
+                    (axiom-process-force-cd-update)))
+                (axiom-process--replace-mathml)))
     (unless (equal "" axiom-process-preamble)
       (axiom-process-insert-command axiom-process-preamble))
     (setq schedule-cd-update t)
@@ -883,7 +892,29 @@ return it."
                (substring axiom-process-buffer-name 1 -1)
                (car cmdlist) nil (cdr cmdlist)))
       (axiom-process-mode))
+    (when axiom-process-enable-pretty-print
+     (axiom-process-insert-command ")set output mathml on"))
     (current-buffer)))
+
+(defun axiom-process--replace-mathml ()
+  "Replace MathML output with rendered svg."
+  (when axiom-process-enable-pretty-print
+   (with-current-buffer axiom-process-buffer-name
+    (save-excursion
+      (ignore-errors
+        (let* ((beg (progn
+		      (search-backward "<math")
+		      (point)))
+	       (end (progn
+		      (search-forward "</math>\n")
+		      (point)))
+	       (data (buffer-substring-no-properties beg end))
+               (file (make-temp-file "result" nil ".svg"))
+	       (result (shell-command-to-string (format "mml2svg '%s'" data))))
+          (with-temp-file file
+	    (insert result))
+          (delete-region beg end)
+          (insert-image-file file)))))))
 
 ;;;###autoload
 (defun run-axiom (cmd)
