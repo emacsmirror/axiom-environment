@@ -93,6 +93,11 @@ sudo npm install --global mathjax-node-cli"
   :type 'boolean
   :group 'axiom)
 
+(defcustom axiom-process-pretty-print-separator "\n"
+  "Separate pretty printed output from normal one."
+  :type 'string
+  :group 'axiom)
+
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
 
@@ -899,22 +904,45 @@ return it."
 (defun axiom-process--replace-mathml ()
   "Replace MathML output with rendered svg."
   (when axiom-process-enable-pretty-print
-   (with-current-buffer axiom-process-buffer-name
-    (save-excursion
-      (ignore-errors
-        (let* ((beg (progn
-		      (search-backward "<math")
-		      (point)))
-	       (end (progn
-		      (search-forward "</math>\n")
-		      (point)))
-	       (data (buffer-substring-no-properties beg end))
-               (file (make-temp-file "result" nil ".svg"))
-	       (result (shell-command-to-string (format "mml2svg '%s'" data))))
-          (with-temp-file file
-	    (insert result))
-          (delete-region beg end)
-          (insert-image-file file)))))))
+    (with-current-buffer axiom-process-buffer-name
+      (save-excursion
+        (ignore-errors
+          (let* ((beg (progn
+		        (search-backward "<math")
+		        (point)))
+	         (end (progn
+		        (search-forward "</math>\n")
+		        (point)))
+	         (data (buffer-substring-no-properties beg end))
+                 (file (make-temp-file "result" nil ".svg"))
+                 (buf (find-file-noselect file t t))
+                 (err-buf (generate-new-buffer "*mml2svg stderr*" t)))
+            (make-process
+             :name "mml2svg"
+             :command (list "mml2svg"  data)
+             :buffer buf
+             :stderr err-buf
+             :noquery t
+             :sentinel (lambda (_ event)
+                         (if (string= event "finished\n")
+                             (progn
+                               (with-current-buffer buf
+                                 (basic-save-buffer)
+                                 (kill-this-buffer))
+                               (with-current-buffer err-buf
+                                 (kill-this-buffer))
+                               (with-current-buffer axiom-process-buffer-name
+                                 (save-excursion
+                                   (goto-char (point-max))
+                                   (let ((beg (progn
+                                                (search-backward data)
+                                                (point)))
+                                         (end (progn
+                                                (search-forward data)
+                                                (point))))
+                                     (delete-region beg end)
+                                     (insert axiom-process-pretty-print-separator)
+                                     (insert-image-file file))))))))))))))
 
 ;;;###autoload
 (defun run-axiom (cmd)
