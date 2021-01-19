@@ -98,6 +98,12 @@ sudo npm install --global mathjax-node-cli"
   :type 'string
   :group 'axiom)
 
+(defcustom axiom-process-pretty-print-mml2svg-binary-path "mml2svg"
+  "Path to mml2svg binary for pretty printing.
+No need to change int if `mml2svg' inside your PATH."
+  :type 'string
+  :group 'axiom)
+
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
 
@@ -919,7 +925,7 @@ return it."
                  (err-buf (generate-new-buffer "*mml2svg stderr*" t)))
             (make-process
              :name "mml2svg"
-             :command (list "mml2svg"  data)
+             :command (list axiom-process-pretty-print-mml2svg-binary-path data)
              :buffer buf
              :stderr err-buf
              :noquery t
