@@ -100,7 +100,7 @@ sudo npm install --global mathjax-node-cli"
 
 (defcustom axiom-process-pretty-print-mml2svg-binary-path "mml2svg"
   "Path to mml2svg binary for pretty printing.
-No need to change int if `mml2svg' inside your PATH."
+No need to change it if `mml2svg' inside your PATH."
   :type 'string
   :group 'axiom)
 
@@ -967,7 +967,7 @@ return it."
 
 (defun axiom-process--plot (&optional input)
   "Plot embedded svg images using gnuplot.
-If no INPUT provided it ties to plot previous input."
+If no INPUT provided it tries to plot previous input."
   (if axiom-process-embed-gnu-draw
       (ignore-errors
         (if (and (not input)
