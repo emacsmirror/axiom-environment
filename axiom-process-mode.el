@@ -100,9 +100,23 @@ sudo npm install --global mathjax-node-cli"
 
 (defcustom axiom-process-pretty-print-mml2svg-binary-path "mml2svg"
   "Path to mml2svg binary for pretty printing.
-No need to change int if `mml2svg' inside your PATH."
+No need to change it if `mml2svg' inside your PATH."
   :type 'string
   :group 'axiom)
+
+(defcustom axiom-process-embed-gnu-draw nil
+  "Enable embedded gnu draw images by gnuplot."
+  :type 'boolean
+  :group 'axiom)
+
+(defcustom axiom-process-gnuplot-binary-path "gnuplot"
+  "Path to gnuplot for embedding gnu draw images."
+  :type 'string
+  :group 'axiom)
+
+(defvar-local axiom-process--processed-plots nil)
+
+(defvar-local axiom-process--plots-queue nil)
 
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
@@ -881,7 +895,8 @@ variable `axiom-process-webview-url'."
                   (setq schedule-cd-update nil)
                   (let ((axiom-process-buffer-name process-buffer))  ; dynamic binding
                     (axiom-process-force-cd-update)))
-                (axiom-process--replace-mathml)))
+                (axiom-process--replace-mathml)
+                (axiom-process--plot)))
     (unless (equal "" axiom-process-preamble)
       (axiom-process-insert-command axiom-process-preamble))
     (setq schedule-cd-update t)
@@ -949,6 +964,70 @@ return it."
                                      (delete-region beg end)
                                      (insert axiom-process-pretty-print-separator)
                                      (insert-image-file file))))))))))))))
+
+(defun axiom-process--plot (&optional input)
+  "Plot embedded svg images using gnuplot.
+If no INPUT provided it tries to plot previous input."
+  (if axiom-process-embed-gnu-draw
+      (ignore-errors
+        (if (and (not input)
+                 axiom-process--plots-queue)
+            (cl-mapc 'axiom-process--plot axiom-process--plots-queue))
+        (let* ((prev-input (if input
+                               input
+                             (string-trim (substring-no-properties (comint-previous-input-string 0)))))
+               (processed (cl-find-if (lambda (s) (string= prev-input s)) axiom-process--processed-plots))
+               (file (if (string-prefix-p "gnuDraw(" prev-input)
+                         (progn
+                           (string-match "\"\\([^\"]+\\)\"" prev-input)
+                           (match-string 1 prev-input))))
+               (file-exists (file-exists-p file))
+               (file-size (if file-exists (file-attribute-size (file-attributes file))))
+               (process (and
+                         file-exists
+                         (not processed)
+                         file-size
+                         (> file-size 0)))
+               (output-file (if process
+                                (make-temp-file "result" nil ".svg")))
+               (buf (if process (find-file-noselect output-file t t)))
+               (err-buf (if process (generate-new-buffer "*gnuplot stderr*" t))))
+          (if (and
+               (not input)
+               (not processed)
+               file)
+              (cl-pushnew prev-input axiom-process--plots-queue :test 'string=))
+          (if process
+              (progn
+                (push prev-input axiom-process--processed-plots)
+                (setq axiom-process--plots-queue
+                      (cl-remove-if
+                       (lambda (s) (string= prev-input s))
+                       axiom-process--plots-queue))
+                (make-process
+                 :name "gnuplot"
+                 :command (list axiom-process-gnuplot-binary-path
+                                "-e" "set term svg" "-c" file)
+                 :buffer buf
+                 :stderr err-buf
+                 :noquery t
+                 :sentinel
+                 (lambda (_ event)
+	           (if (string= event "finished\n")
+                       (progn
+                         (with-current-buffer buf
+		           (basic-save-buffer)
+		           (kill-this-buffer))
+                         (with-current-buffer err-buf
+		           (kill-this-buffer))
+                         (with-current-buffer axiom-process-buffer-name
+		           (save-excursion
+                             (goto-char (point-max))
+                             (search-backward prev-input)
+                             (end-of-line)
+                             (insert "\n")
+                             (insert-image-file output-file)
+		             (insert "\n")))))))))))))
 
 ;;;###autoload
 (defun run-axiom (cmd)
