@@ -937,7 +937,7 @@ return it."
 	         (data (buffer-substring-no-properties beg end))
                  (file (make-temp-file "result" nil ".svg"))
                  (buf (find-file-noselect file t t))
-                 (err-buf (generate-new-buffer "*mml2svg stderr*" t)))
+                 (err-buf (generate-new-buffer "*mml2svg stderr*")))
             (make-process
              :name "mml2svg"
              :command (list axiom-process-pretty-print-mml2svg-binary-path data)
@@ -991,7 +991,7 @@ If no INPUT provided it tries to plot previous input."
                (output-file (if process
                                 (make-temp-file "result" nil ".svg")))
                (buf (if process (find-file-noselect output-file t t)))
-               (err-buf (if process (generate-new-buffer "*gnuplot stderr*" t))))
+               (err-buf (if process (generate-new-buffer "*gnuplot stderr*"))))
           (if (and
                (not input)
                (not processed)
