@@ -104,6 +104,11 @@ No need to change it if `mml2svg' inside your PATH."
   :type 'string
   :group 'axiom)
 
+(defcustom axiom-process-show-svg nil
+  "Enable showing svg images."
+  :type 'boolean
+  :group 'axiom)
+
 (defcustom axiom-process-embed-gnu-draw nil
   "Enable embedded gnu draw images by gnuplot."
   :type 'boolean
@@ -117,6 +122,10 @@ No need to change it if `mml2svg' inside your PATH."
 (defvar-local axiom-process--processed-plots nil)
 
 (defvar-local axiom-process--plots-queue nil)
+
+(defvar-local axiom-process--processed-svg nil)
+
+(defvar-local axiom-process--svg-queue nil)
 
 (defvar axiom-process-mode-hook nil
   "Hook for customizing `axiom-process-mode'.")
@@ -896,7 +905,8 @@ variable `axiom-process-webview-url'."
                   (let ((axiom-process-buffer-name process-buffer))  ; dynamic binding
                     (axiom-process-force-cd-update)))
                 (axiom-process--replace-mathml)
-                (axiom-process--plot)))
+                (axiom-process--plot)
+		(axiom-process--show-svg)))
     (unless (equal "" axiom-process-preamble)
       (axiom-process-insert-command axiom-process-preamble))
     (setq schedule-cd-update t)
@@ -1028,6 +1038,50 @@ If no INPUT provided it tries to plot previous input."
                              (insert "\n")
                              (insert-image-file output-file)
 		             (insert "\n")))))))))))))
+
+(defun axiom-process--show-svg (&optional input)
+  "Show svg images created by modern graphics backend.
+If no INPUT provided it tries to show previous input."
+  (if axiom-process-show-svg
+      (ignore-errors
+        (if (and (not input)
+                 axiom-process--svg-queue)
+            (cl-mapc 'axiom-process--show-svg axiom-process--svg-queue))
+        (let* ((prev-input (if input
+                               input
+                             (string-trim (substring-no-properties (comint-previous-input-string 0)))))
+               (processed (cl-find-if (lambda (s) (string= prev-input s)) axiom-process--processed-svg))
+               (file (if (string-prefix-p "writeSvg" prev-input)
+                         (progn
+                           (string-match "\"\\([^\"]+.*\.svg\\)\"" prev-input)
+                           (match-string 1 prev-input))))
+               (file-exists (file-exists-p file))
+               (file-size (if file-exists (file-attribute-size (file-attributes file))))
+               (process (and
+                         file-exists
+                         (not processed)
+                         file-size
+                         (> file-size 0))))
+          (if (and
+               (not input)
+               (not processed)
+               file)
+              (cl-pushnew prev-input axiom-process--svg-queue :test 'string=))
+          (if process
+              (progn
+                (push prev-input axiom-process--processed-svg)
+                (setq axiom-process--svg-queue
+                      (cl-remove-if
+                       (lambda (s) (string= prev-input s))
+                       axiom-process--svg-queue))
+		(with-current-buffer axiom-process-buffer-name
+		  (save-excursion
+                    (goto-char (point-max))
+                    (search-backward prev-input)
+                    (end-of-line)
+                    (insert "\n")
+                    (insert-image-file file)
+		    (insert "\n")))))))))
 
 ;;;###autoload
 (defun run-axiom (cmd)
