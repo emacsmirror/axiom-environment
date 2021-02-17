@@ -103,7 +103,14 @@ customization group.  Likely candidates you will want to change
 include:-
 
   axiom-process-program
+
   axiom-process-spad-source-dirs
+
+  axiom-process-enable-pretty-print
+
+  axiom-process-embed-gnu-draw
+
+  axiom-process-show-svg
 
 An easy way of managing arbitrary collections of customization
 variables is available via the Emacs ``theme'' mechanism.  Example
