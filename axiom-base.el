@@ -1,6 +1,6 @@
 ;;; axiom-base.el --- Basic setup for the Axiom environment -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2019 Paul Onions
+;; Copyright (C) 2013 - 2021 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -456,12 +456,12 @@ of the next non-blank line."
                (setq done t))
               ((eql (char-before p) ?_)
                (setq posn p)
-               (incf n))
+               (cl-incf n))
               (t
                (setq posn p)
                (setq done t)))))
     (goto-char posn)
-    (re-search-forward "^.+$")
+    (re-search-forward "^.+$" nil t)
     (beginning-of-line)))
 
 (defun axiom-get-rest-of-line ()
@@ -479,7 +479,7 @@ continuation-lines (underscores escape new lines)."
                (setq done t))
               ((eql (char-before p) ?_)
                (push p posns)
-               (incf n))
+               (cl-incf n))
               (t
                (push p posns)
                (setq done t)))))
