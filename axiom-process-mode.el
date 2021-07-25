@@ -218,6 +218,7 @@ prompt in output to OUTPUT-BUFFER."
         (goto-char (process-mark proc))
         (insert-before-markers command "\n"))
       (comint-redirect-send-command command output-buffer echo-result (not display))
+      (sit-for 0.1)  ; this seems to help us capture all output reliably
       (while (not comint-redirect-completed)
         (accept-process-output proc)
         (redisplay))
