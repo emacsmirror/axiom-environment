@@ -1,6 +1,6 @@
 ;;; axiom-process-mode.el --- A Comint-derived mode for Axiom -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013 - 2019 Paul Onions
+;; Copyright (C) 2013 - 2021 Paul Onions
 
 ;; Author: Paul Onions <paul.onions@acm.org>
 ;; Keywords: Axiom, OpenAxiom, FriCAS
@@ -26,7 +26,7 @@ Must begin and end with an asterisk."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-program "fricas -nosman"
+(defcustom axiom-process-program "fricas -noht"
   "Command line to invoke the Axiom process."
   :type 'string
   :group 'axiom)
@@ -766,6 +766,15 @@ variable `axiom-process-webview-url'."
           (goto-char (point-min))
           (forward-line (cl-second location)))
       (message "Source not found"))))
+
+;;;###autoload
+(defun axiom-process-start-hyperdoc ()
+  (interactive)
+  "Start the HyperDoc GUI from within FriCAS."
+  (interactive)
+  (if (null (get-buffer axiom-process-buffer-name))
+      (message axiom-process-not-running-message)
+    (axiom-process-insert-command ")hd")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-completion functions
