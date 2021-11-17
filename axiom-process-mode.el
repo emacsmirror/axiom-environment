@@ -26,7 +26,7 @@ Must begin and end with an asterisk."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-program "fricas -noht"
+(defcustom axiom-process-program "fricas -nosman"
   "Command line to invoke the Axiom process."
   :type 'string
   :group 'axiom)
@@ -769,7 +769,6 @@ variable `axiom-process-webview-url'."
 
 ;;;###autoload
 (defun axiom-process-start-hyperdoc ()
-  (interactive)
   "Start the HyperDoc GUI from within FriCAS."
   (interactive)
   (if (null (get-buffer axiom-process-buffer-name))
