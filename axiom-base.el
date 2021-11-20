@@ -390,8 +390,7 @@ of the space, to the specified indentation level."
     (define-key menu-map [axiom-menu-run-axiom]
       '(menu-item "Run Axiom" run-axiom))
     (define-key menu-map [axiom-menu-start-hyperdoc]
-      '(menu-item "Start HyperdDoc" axiom-process-start-hyperdoc
-                  :enable nil))
+      '(menu-item "Start HyperDoc" axiom-process-start-hyperdoc))
     (define-key menu-map [axiom-menu-separator-4]
       '(menu-item "--"))
     (define-key menu-map [axiom-menu-edit-customization-group]

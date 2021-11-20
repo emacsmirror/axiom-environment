@@ -26,7 +26,7 @@ Must begin and end with an asterisk."
   :type 'string
   :group 'axiom)
 
-(defcustom axiom-process-program "fricas -nosman"
+(defcustom axiom-process-program "fricas -noht"
   "Command line to invoke the Axiom process."
   :type 'string
   :group 'axiom)
@@ -196,10 +196,10 @@ the user is part-way through editing the next command."
                                                     op-cmd op-prompt)
   "Send COMMAND to Axiom and put result in OUTPUT-BUFFER.
 
-If DISPLAY is non-nil then display the result buffer.
+If DISPLAY is non-nil then display the output buffer.
 
-If ECHO-CMD is non-nil then copy the command to the process buffer,
-and if ECHO-RESULT is non-nil then also copy the result too.
+If ECHO-CMD is non-nil then copy the command to the Axiom process
+buffer, and if ECHO-RESULT is non-nil then also copy the result.
 
 If OP-CMD is non-nil then include command in output to
 OUTPUT-BUFFER.  If OP-PROMPT is non-nil then also include
@@ -222,8 +222,30 @@ prompt in output to OUTPUT-BUFFER."
       (while (not comint-redirect-completed)
         (accept-process-output proc)
         (redisplay))
+      (axiom-process-sanitize-redirected-output output-buffer)  ; clean up output text
       (when (and echo-cmd (not echo-result))  ; get prompt back
         (axiom-process-insert-command "")))))
+
+(defun axiom-process-sanitize-redirected-output (buffer)
+  "Clean up redirected command's output text.
+
+Remove 'erase' characters and the characters they erase from the
+first line of output.  This is necessary when FriCAS is run with
+'sman' enabled."
+  (with-current-buffer buffer
+    (save-excursion
+      (goto-char (1+ (point-min)))
+      (let ((done nil))
+        (while (and (< (point) (point-max))
+                    (not done))
+          (cond ((eql (char-after) ?\b)
+                 (delete-char +1)
+                 (when (> (point) (point-min))
+                   (delete-char -1)))
+                ((eql (char-after) ?\n)
+                 (setq done t))
+                (t
+                 (goto-char (1+ (point))))))))))
 
 (defun axiom-process-get-old-input ()
   "An Axiom-specific replacement for `comint-get-old-input'.
