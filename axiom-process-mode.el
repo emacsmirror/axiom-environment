@@ -854,6 +854,8 @@ variable `axiom-process-webview-url'."
                          ((looking-at "[[:blank:]]*)compile[[:blank:]]+")
                           :all)
                          ((looking-at "[[:blank:]]*)library[[:blank:]]+")
+                          :all)
+                         ((looking-at "[[:blank:]]*)edit[[:blank:]]+")
                           :all))))
     (and filter (axiom-process-complete-command-filename filter))))
 
