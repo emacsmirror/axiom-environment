@@ -951,8 +951,14 @@ The name of the buffer is given by variable
 `axiom-process-buffer-name', and uses major mode
 `axiom-process-mode'.  Return the buffer in which the process is
 started.  If there is a process already running then simply
-return it."
+return it.
+
+Also, if environment variable FRICASEDITOR is not already set
+then set it to a string that will invoke the emacsclient program."
   (with-current-buffer (get-buffer-create axiom-process-buffer-name)
+    (when (null (getenv "FRICASEDITOR"))
+      (setenv "FRICASEDITOR" "emacsclient -n +$line $name")
+      (setenv "FRICASDITOR" "emacsclient -n +$line $name"))  ; workaround bug in current FriCAS
     (when (not (comint-check-proc (current-buffer)))
       (let ((cmdlist (split-string process-cmd)))
         (apply (function make-comint)
