@@ -1,4 +1,14 @@
 
+-----------------------------------------------------------------------
+
+IMPORTANT: This package is DEPRECATED and no further development will
+take place.  It has been replaced by the Frimacs package
+(http://github.com/pdo/frimacs).  To switch, first uninstall the
+axiom-environment, company-axiom and ob-axiom packages, then install
+Frimacs (also available on MELPA).
+
+-----------------------------------------------------------------------
+
 AN AXIOM ENVIRONMENT FOR EMACS
 ==============================
 
